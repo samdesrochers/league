@@ -1,0 +1,5 @@
+Start Server
+mongod --dbpath E:\JS\leagueR\data\
+
+mongo
+use usercollection
