@@ -1,14 +1,12 @@
 // Userlist data array for filling in info box
 var userListData = [];
+var apikey = "b4283e24-9216-4553-9e73-ac664a6a9d8b";
 
 // DOM Ready =============================================================
 $(document).ready(function() {
 
     // Populate the user table on initial page load
     populateTable();
-
-    // Username link click
-    $('#userList table tbody').on('click', 'td a.linkshowuser', showUserInfo);
 
     // Add User button click
     $('#btnAddUser').on('click', addUser);
@@ -33,18 +31,20 @@ function populateTable() {
 
         // For each item in our JSON, add a table row and cells to the content string
         $.each(data, function(){
-            tableContent += '<tr>';
-            tableContent += '<td><a href="#" class="linkshowuser" rel="' + this.playername + '">' + this.playername + '</a></td>';
-            tableContent += '<td>' + this.games + '</td>';
-            tableContent += '<td>' + this.wins + '</td>';
-            tableContent += '<td>' + this.losses + '</td>';
-            tableContent += '<td>' + this.topchamp + '</td>';
-            tableContent += '<td><a href="#" class="linkdeleteuser" rel="' + this._id + '">delete</a></td>';
-            tableContent += '</tr>';
+            tableContent += '<div class="lbrow"><ul>';
+            tableContent += '<li><a href="#" class="linkshowuser" rel="' + this.playername + '">' + this.playername + '</a></li>';
+            tableContent += '<li><input class="lbrow_input" type="text" value="'+ this.games +'"></input></li>';
+            tableContent += '<li>' + this.wins + '</li>';
+            tableContent += '<li>' + this.losses + '</li>';
+            tableContent += '<li><img src="http://ddragon.leagueoflegends.com/cdn/5.22.1/img/champion/' + this.topchamp + '.png" alt="' + this.topchamp +'"/></li>';
+            tableContent += '<li><a href="#" class="linkdeleteuser" rel="' + this._id + '">delete</a></li>';
+            tableContent += '</ul></div>';
         });
 
         // Inject the whole content string into our existing HTML table
-        $('#userList table tbody').html(tableContent);
+        $('#leaderboard').append(tableContent);
+
+        showPlayerInfo(0);
     });
 };
 
@@ -59,7 +59,7 @@ function addUser(event) {
     });
 
     // Check and make sure errorCount's still at zero
-    if(errorCount === 0) {
+    if (errorCount === 0) {
 
         // If it is, compile all user info into one object
         var newUser = {
@@ -77,22 +77,16 @@ function addUser(event) {
             url: '/users/adduser',
             dataType: 'JSON'
         }).done(function( response ) {
-
             // Check for successful (blank) response
             if (response.msg === '') {
-
                 // Clear the form inputs
                 $('#addUser fieldset input').val('');
-
                 // Update the table
                 populateTable();
-
             }
             else {
-
                 // If something goes wrong, alert the error message that our service returned
                 alert('Error: ' + response.msg);
-
             }
         });
     }
@@ -105,7 +99,6 @@ function addUser(event) {
 
 // Delete User
 function deleteUser(event) {
-
     event.preventDefault();
 
     // Pop up a confirmation dialog
@@ -119,7 +112,6 @@ function deleteUser(event) {
             type: 'DELETE',
             url: '/users/deleteuser/' + $(this).attr('rel')
         }).done(function( response ) {
-
             // Check for a successful (blank) response
             if (response.msg === '') {
             }
@@ -129,15 +121,10 @@ function deleteUser(event) {
 
             // Update the table
             populateTable();
-
         });
-
     }
     else {
-
         // If they said no to the confirm, do nothing
         return false;
-
     }
-
 };

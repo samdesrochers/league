@@ -8,7 +8,7 @@ $(document).ready(function() {
     populateTable();
 
     // Username link click
-    $('#userList table tbody').on('click', 'td a.linkshowuser', showUserInfo);
+    $('#userList table tbody').on('click', 'td a.linkshowuser', showPlayerInfoEventHandler);
 });
 
 // Functions =============================================================
@@ -38,11 +38,13 @@ function populateTable() {
 
         // Inject the whole content string into our existing HTML table
         $('#userList table tbody').html(tableContent);
+
+        showPlayerInfo(0);
     });
 };
 
 // Show User Info
-function showUserInfo(event) {
+function showPlayerInfoEventHandler(event) {
 
     // Prevent Link from Firing
     event.preventDefault();
@@ -53,12 +55,16 @@ function showUserInfo(event) {
     // Get Index of object based on id value
     var arrayPosition = userListData.map(function(arrayItem) { return arrayItem.playername; }).indexOf(thisUserName);
 
-    // Get our User Object
-    var thisUserObject = userListData[arrayPosition];
+    showPlayerInfo(arrayPosition);
+};
+
+function showPlayerInfo(index) {
+
+    var thisUserObject = userListData[index];
 
     //Populate Info Box
     $('#playerInfoName').text(thisUserObject.playername);
     $('#playerInfoGamesPlayed').text(thisUserObject.games);
     $('#playerInfoWins').text(thisUserObject.wins);
     $('#playerInfoTopChamp').text(thisUserObject.topchamp);
-};
+}

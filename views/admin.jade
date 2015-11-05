@@ -6,60 +6,54 @@ html
   body
     script(src='http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js')
     script(src='/javascripts/userlist.js')
-    script(src='/javascripts/global.js')
+    script(src='/javascripts/crud.js')
 
 block content
     h1= title
 
-    // Wrapper
     #wrapper
 
-        // USER INFO
         #userInfo
-            h2 Player Info
-            p
-                strong Player Name:
-                |  <span id='playerInfoName'></span>
-                br
-                strong Games Played:
-                |  <span id='playerInfoGamesPlayed'></span>
-                br
-                strong Wins:
-                |  <span id='playerInfoWins'></span>
-                br
-                strong Top Champ:
-                |  <span id='playerInfoTopChamp'></span>
-        // /USER INFO
+            #addUser
+                h2 Add New Player
+                fieldset
+                    input#inputPlayerName(type='text', placeholder='Player Name')
+                    br
+                    input#inputGamesPlayed(type='text', placeholder='Games Played')
+                    br
+                    input#inputWins(type='text', placeholder='Win')
+                    br
+                    input#inputLosses(type='text', placeholder='Loss')
+                    br
+                    input#inputTopChamp(type='text', placeholder='Top Champion')                
+                    br
+                    button#btnAddUser Add Player
+                    br
+                    br
+                h2 Add/Edit Champion
+                fieldset
+                    input#inputPlayerName(type='text', placeholder='Player Name')
+                    br
+                    input#inputGamesPlayed(type='text', placeholder='Games Played')
+                    br
+                    input#inputWins(type='text', placeholder='Win')
+                    br
+                    input#inputLosses(type='text', placeholder='Loss')
+                    br
+                    input#inputTopChamp(type='text', placeholder='Top Champion')                
+                    br
+                    button#btnAddUser Add Player
 
-        // USER LIST
-        h2 Players Leaderboard 
         #userList
-            table
-                thead
-                    th Player
-                    th Games Played
-                    th Wins
-                    th Losses
-                    th Top Champion
-                    th Delete
-                tbody
-        // /USER LIST
+            h2 Players Leaderboard 
+            #leaderboard
 
-        // ADD USER
-        h2 Add User
-        #addUser
-            fieldset
-                input#inputPlayerName(type='text', placeholder='Player Name')
-                br
-                input#inputGamesPlayed(type='text', placeholder='Games Played')
-                br
-                input#inputWins(type='text', placeholder='Win')
-                br
-                input#inputLosses(type='text', placeholder='Loss')
-                br
-                input#inputTopChamp(type='text', placeholder='Top Champion')                
-                br
-                button#btnAddUser Add User
-        // /ADD USER
-
-    // /WRAPPER
+            //- table
+            //-     thead
+            //-         th Player
+            //-         th Games Played
+            //-         th Wins
+            //-         th Losses
+            //-         th Top Champion
+            //-         th Delete
+            //-     tbody
