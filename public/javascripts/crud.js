@@ -31,20 +31,41 @@ function populateTable() {
 
         // For each item in our JSON, add a table row and cells to the content string
         $.each(data, function(){
-            tableContent += '<div class="lbrow"><ul>';
-            tableContent += '<li><a href="#" class="linkshowuser" rel="' + this.playername + '">' + this.playername + '</a></li>';
-            tableContent += '<li><input class="lbrow_input" type="text" value="'+ this.games +'"></input></li>';
-            tableContent += '<li>' + this.wins + '</li>';
-            tableContent += '<li>' + this.losses + '</li>';
-            tableContent += '<li><img src="http://ddragon.leagueoflegends.com/cdn/5.22.1/img/champion/' + this.topchamp + '.png" alt="' + this.topchamp +'"/></li>';
-            tableContent += '<li><a href="#" class="linkdeleteuser" rel="' + this._id + '">delete</a></li>';
-            tableContent += '</ul></div>';
+            tableContent += '<div class="playerContainer">';
+            tableContent += '<div class="playerName"><a href="#" class="linkshowuser" rel="' + this.playername + '">' + this.playername + '</a> - <a href="#" class="linkdeleteuser" rel="' + this._id + '">delete</a></div>';
+            tableContent += '<table class="playerTable">';
+            tableContent += '<tr class="playerTableRow1">';
+                tableContent += '<td class="tdChampSquare"><img class="imgSmallSquare" src="http://ddragon.leagueoflegends.com/cdn/5.22.1/img/champion/' + this.topchamp + '.png" alt="' + this.topchamp +'"/></td>';
+                tableContent += '<td class="tdHeaderValue">' + this.wins + '</td>';
+                tableContent += '<td class="tdHeaderValue">' + this.wins + '</td>';
+                tableContent += '<td class="tdHeaderValue">' + this.wins + '</td>';
+                tableContent += '<td class="tdHeaderValue">' + this.wins + '</td>';
+                tableContent += '<td class="tdHeaderValue">' + this.wins + '</td>';
+                tableContent += '<td class="tdHeaderValue">' + this.wins + '</td>';
+                tableContent += '<td class="tdHeaderValue">' + this.wins + '</td>';
+                tableContent += '<td class="tdHeaderValue">' + this.wins + '</td>';
+                tableContent += '<td class="tdHeaderValue">' + this.wins + '</td>';
+                tableContent += '<td class="tdHeaderValue">' + this.wins + '</td>';
+            tableContent += '</tr>';
+            tableContent += '<tr class="playerTableRow2">';
+                tableContent += '<td class="tdHeaderTitle">Top</td>';
+                tableContent += '<td class="tdHeaderTitle">Kills</td>';
+                tableContent += '<td class="tdHeaderTitle">Deaths</td>';
+                tableContent += '<td class="tdHeaderTitle">Assists</td>';
+                tableContent += '<td class="tdHeaderTitle">KDA</td>';
+                tableContent += '<td class="tdHeaderTitle">Wins</td>';
+                tableContent += '<td class="tdHeaderTitle">Games</td>';
+                tableContent += '<td class="tdHeaderTitle">CS</td>';
+                tableContent += '<td class="tdHeaderTitle">AVG CS</td>';
+                tableContent += '<td class="tdHeaderTitle">Gold</td>';
+                tableContent += '<td class="tdHeaderTitle">AVG Gold</td>';
+            tableContent += '</tr>';
+            tableContent += '</table>';
+            tableContent += '</div>';
         });
 
         // Inject the whole content string into our existing HTML table
         $('#leaderboard').append(tableContent);
-
-        showPlayerInfo(0);
     });
 };
 

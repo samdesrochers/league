@@ -1,5 +1,4 @@
 body {
-  width: 1000px;
   padding: 30px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 
@@ -8,66 +7,17 @@ body {
 }
 
 h1 {
-    background-color: #b20000;
-    padding: 40px 5px;
-    border-radius: 15px;
-    margin-bottom: 50px;
-    width: auto;
+    width: 1000px;
+    margin: 0 auto;
 }
 
-h2 {
-    margin:0 0 .5em 0;
-}
-
-a {
-  color: #00B7FF;
+a:visited {
+    color: #3399FF;
 }
 
 #wrapper {
-    width: 95%;
-}
-
-#userList {
-    width: 60%;
-    float: right;
-    padding-right: 5%;
-}
-
-#userList table {
-    border-collapse:separate;
-    border-spacing:1px;
-    background:#CCC;
-    color: black;
-}
-
-#userList table th {
-    background:#EEE;
-    font-weight:600;
-    padding:10px 20px;
-    text-align:center;
-}
-
-#userList table tbody {
-    padding:0; margin:0;
-    border-collapse:collapse;
-    border-spacing:0px;
-}
-
-#userList table td {
-    background:#FFF;
-    padding:5px 10px;
-    text-align:center;
-}
-
-#userInfo {
-    width:30%;
-    float: left;
-}
-
-#userInfo p {
-    padding:15px;
-    border:1px solid #CCC;
-    background:rgba(80,120,255,0.05);
+    width: 1000px;
+    margin: 0 auto;
 }
 
 fieldset {
@@ -77,19 +27,54 @@ fieldset {
     vertical-align: baseline;
 }
 
-.lbrow {
+.playerContainer {
+    width: 90%;
+    display: inline-block;
+    background-color: #333;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.playerHeader {
+    margin: 0 auto;
+}
+
+.playerName {
+    font-size: 20px;
+    margin-bottom: 10px;
+    background-color: transparent;
     display: inline-block;
 }
 
-.lbrow li{
-    width:85%;
-    padding:3px;
-    border-bottom:1px solid #555;
-    color: #aaa;
-    font-size: 18px;
+.playerTable {
+    width: 100%;
+    color: black;
+    text-align: center;
+    margin-top: 10px;
+    margin: 0 auto;
+    background-color: #ddd;
 }
 
-.lbrow_input {
-    width: 40px;
-    text-align: center;
+.tdHeaderValue {
+    width: 90px;
+    font-size: 20px;
+    height: 60px;
+}
+
+.imgSmallSquare {
+    width: 64px;
+    height: 64px;
+}
+
+.tdHeaderTitle {
+    width: 100px; 
+    height: 30px;
+    font-size: 14px;
+}
+
+.linkshowuser {
+    text-decoration: none;
+    font-size: 24px;
+    font-weight: bold;
+    color: #3399FF;
 }
