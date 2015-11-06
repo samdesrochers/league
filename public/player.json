@@ -1,0 +1,31 @@
+{
+   "name":"Gino",
+   "champions":[
+      {
+         "name":"Teemo",
+         "kills":4,
+         "deaths":3,
+         "assists":2,
+         "kda":3,
+         "wins":4,
+         "games":5,
+         "cs":3,
+         "avgcs":200,
+         "gold":1923,
+         "avggold":4234
+      },
+      {
+         "name":"Akali",
+         "kills":5,
+         "deaths":1,
+         "assists":12,
+         "kda":3,
+         "wins":6,
+         "games":4,
+         "cs":4,
+         "avgcs":220,
+         "gold":243,
+         "avggold":134
+      }
+   ]
+}

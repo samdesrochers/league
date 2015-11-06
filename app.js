@@ -7,7 +7,7 @@ var bodyParser = require('body-parser');
 
 var mongo = require('mongodb');
 var monk = require('monk');
-var db = monk('localhost:27017/leagueR');
+var db = monk('localhost:27017/league');
 
 var routes = require('./routes/index');
 var admin = require('./routes/admin');

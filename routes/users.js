@@ -26,6 +26,20 @@ router.post('/adduser', function(req, res) {
 });
 
 /*
+ * PUT existing user.
+ */
+router.put('/updateuser/:id', function(req, res) {
+    var db = req.db;
+    var collection = db.get('players');
+    console.log(req.body);
+    collection.update({ '_id' : req.params.id }, { 'champions' : req.body.champions }, function(err, result){
+        res.send(
+            (err === null) ? { msg: '' } : { msg: err }
+        );
+    });
+});
+
+/*
  * DELETE existing user.
  */
 router.delete('/deleteuser/:id', function(req, res) {
