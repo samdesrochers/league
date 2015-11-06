@@ -5,7 +5,8 @@ html
     link(rel='stylesheet', href='/stylesheets/style.css')
   body
     script(src='http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js')
-    script(src='/javascripts/crud.js')
+    script(src='/javascripts/tablehelper.js')
+    script(src='/javascripts/admintable.js')
 
 block content
     h1= title
@@ -46,7 +47,10 @@ block content
         #userList
             h2 Players Leaderboard 
             #leaderboard
-
+            br
+            fieldset
+                input#inputPlayerName(type='text', placeholder='Player Name')
+                button#btnAddPlayer Add Player
             //- table
             //-     thead
             //-         th Player

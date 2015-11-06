@@ -12,6 +12,7 @@ var db = monk('localhost:27017/players');
 var routes = require('./routes/index');
 var admin = require('./routes/admin');
 var player = require('./routes/player');
+var riot = require('./routes/riot');
 var users = require('./routes/users');
 var leaderboard = require('./routes/leaderboard');
 
@@ -38,6 +39,7 @@ app.use(function(req,res,next){
 app.use('/', routes);
 app.use('/admin', admin);
 app.use('/player', player);
+app.use('/riot', riot);
 app.use('/users', users);
 app.use('/leaderboard', leaderboard);
 

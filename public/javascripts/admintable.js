@@ -1,6 +1,5 @@
 // Userlist data array for filling in info box
 var userListData = [];
-var apikey = "b4283e24-9216-4553-9e73-ac664a6a9d8b";
 
 // DOM Ready =============================================================
 $(document).ready(function() {
@@ -9,7 +8,7 @@ $(document).ready(function() {
     populateTable(true);
 
     // Add User button click
-    $('#btnAddUser').on('click', addUser);
+    $('#btnAddPlayer').on('click', addPlayer);
 });
 
 // Functions =============================================================
@@ -27,27 +26,39 @@ function populateTable(shouldHideChampions) {
         // Stick our user data array into a userlist variable in the global object
         userListData = data;
 
+
+        var index = 1;
         // For each item in our JSON, add a table row and cells to the content string
         $.each(data, function(){
             try{
-                // debug json validator
-                try{
-                    var championsJSON = $.parseJSON(this.champions);
-                    this.champions = championsJSON;
-                }   catch(e) {
-
-                }
 
                 tableContent += '<div class="playerContainer" id="container_' + this._id +'"">';
-                tableContent += '<div class="playerName"><a href="#" class="linkshowuser" rel="' + this.name + '">' + this.name + '</a> - <a href="#" class="linkdeleteuser" rel="' + this._id + '">delete</a></div>';
+                tableContent += '<div class="playerName"><a href="#" class="linkshowuser" rel="' + this.name + '"># ' + index++ + " " + this.name + '</a> - <a href="#" class="linkdeleteuser" rel="' + this._id + '">delete</a></div>';
                 tableContent += '<table class="playerTable">';
-                tableContent += getChamptionHeaderRow();
-                tableContent += populateTableRows(this, shouldHideChampions);
+
+                // If this user has champions, populate them
+                if(this.champions !== undefined && this.champions !== null) {
+
+                    try {
+                        var championsJSON = $.parseJSON(this.champions);
+                        this.champions = championsJSON;
+                    } catch(e) { }
+
+                    tableContent += getStatsHeaderRow();
+                    tableContent += populateTableRows(this, shouldHideChampions);
+                } else {
+                    tableContent += getStatsHeaderRow();
+                    tableContent += getNewPlayerRow(this._id, this.name, this.iconId);
+                }
+
+                // Add operations bar for each player
                 tableContent += '</table>';
                 tableContent += '<div><a href="#" class="linkaddchampion" rel="' + this._id + '">Add Champion</a> | <a href="#" class="linkupdatechamps" rel="' + this._id + '">Update Champions</a> <a href="#" class="linkshowchamps" rel="' + this._id + '">Toggle Champions</a></div>';
                 tableContent += '</div>';
 
-            } catch(e) {}
+            } catch(e) {
+                console.log(e);
+            }
         });
 
         // Inject the whole content string into our existing HTML table
@@ -62,41 +73,53 @@ function populateTable(shouldHideChampions) {
 };
 
 // Add User
-function addUser(event) {
+function addPlayer(event) {
     event.preventDefault();
+
     var errorCount = 0;
-    $('#addUser input').each(function(index, val) {
+    $('#btnAddPlayer input').each(function(index, val) {
         if($(this).val() === '') { errorCount++; }
     });
 
-    if (errorCount === 0) {
+    var name = $('fieldset input#inputPlayerName').val();
 
-        // If it is, compile all user info into one object
-        var newUser = {
-            playername: $('#addUser fieldset input#inputPlayerName').val(),
-            champions: []
+    // Get Summoner id from RIOT
+    $.getJSON( '/riot/summonerid/' + name, function( data ) {      
+        if (data !== undefined) {
+
+            // hack around RIOT Api, for some reason it always return undefined as leading name for spaced summoner names
+            data = data.substring(1, data.length - 1);
+            data = data.substring(data.indexOf('{'), data.length);
+            data = data.replace("undefined", name);
+            var summoner = $.parseJSON(data);
+            
+            var newPlayer = {
+                name: name,
+                iconId: summoner.profileIconId,
+                champions: []
+            }
+
+            // Use AJAX to post the object to our adduser service
+            $.ajax({
+                type: 'POST',
+                data: newPlayer,
+                url: '/users/adduser',
+                dataType: 'JSON'
+            }).done(function( response ) {
+                if (response.msg === '') {
+                    $('fieldset input').val('');
+                    populateTable(true);
+                }
+                else {
+                    alert('Error: ' + response.msg);
+                }
+            });
         }
-
-        // Use AJAX to post the object to our adduser service
-        $.ajax({
-            type: 'POST',
-            data: newUser,
-            url: '/users/adduser',
-            dataType: 'JSON'
-        }).done(function( response ) {
-            if (response.msg === '') {
-                $('#addUser fieldset input').val('');
-                populateTable();
-            }
-            else {
-                alert('Error: ' + response.msg);
-            }
-        });
-    }
-    else {
-        alert('Please fill in all fields');
-        return false;
-    }
+        else {
+            alert('Please fill in all fields');
+            return false;
+        }
+    });
 };
 
 // Delete User
@@ -131,83 +154,10 @@ function addNewChampion(event) {
 
     var pid = $(this).attr('rel');
     var container = $("#container_" + pid + " .playerTable");
-    var newChampRow = getChampionFormatedRow(pid, null, 2, 1, 4, 6, 4, 333, 2, 1, 5, 340, false);
+    var newChampRow = getChampionRow(pid, null, 2, 1, 4, 6, 4, 333, 340, false);
 
     container.append(newChampRow);
 };
-
-function getChamptionHeaderRow() {
-    var row = ""
-    row += '<tr class="playerTableRow1">';
-    row += '<td class="tdHeaderTitle"></td>';
-    row += '<td class="tdHeaderTitle">Kills</td>';
-    row += '<td class="tdHeaderTitle">Deaths</td>';
-    row += '<td class="tdHeaderTitle">Assists</td>';
-    row += '<td class="tdHeaderTitle">KDA</td>';
-    row += '<td class="tdHeaderTitle">Wins</td>';
-    row += '<td class="tdHeaderTitle">Games</td>';
-    row += '<td class="tdHeaderTitle">CS</td>';
-    row += '<td class="tdHeaderTitle">CS/Games</td>';
-    row += '<td class="tdHeaderTitle">Gold</td>';
-    row += '<td class="tdHeaderTitle">Gold/Games</td>';
-    row += '<td class="tdHeaderTitle">Delete</td>';
-    row += '</tr>';
-    return row;
-}
-
-function getChampionFormatedRow(id, champname, kills, deaths, assists, kda, wins, games, cs, avgcs, gold, avggold, hidden) {
-    var row = '';
-
-    if(hidden) {
-        row += '<tr class="playerTableRowN canHide" style="display:none">';
-    } else {
-        row += '<tr class="playerTableRowN">';
-    }
-
-    if(champname === null) {
-        row += '<td class="tdHeaderValue champname"><input type="text" name="name"></td>';
-        row += '<td class="tdHeaderValue"><input type="text" name="kills" value=' + kills + '></input></td>';
-        row += '<td class="tdHeaderValue"><input type="text" name="deaths" value=' + deaths + '></input></td>';
-        row += '<td class="tdHeaderValue"><input type="text" name="assists" value=' + assists + '></input></td>';
-        row += '<td class="tdHeaderValue"> - </input></td>';
-        row += '<td class="tdHeaderValue"><input type="text" name="wins" value=' + wins + '></input></td>';
-        row += '<td class="tdHeaderValue"><input type="text" name="games" value=' + games + '></input></td>';
-        row += '<td class="tdHeaderValue"><input type="text" name="cs" value=' + cs + '></input></td>';
-        row += '<td class="tdHeaderValue"> - </input></td>';
-        row += '<td class="tdHeaderValue"><input type="text" name="gold" value=' + gold + '></input></td>';
-        row += '<td class="tdHeaderValue"> - </input></td>';
-        row += '<td class="tdHeaderValue"><a href="#" class="linkdeletechamp" rel="' + id + "#" + champname + '">X</a></td>';
-    } else if(champname === "profile") {
-        row += '<td class="tdChampSquare"><img class="imgSmallSquare" src="http://ddragon.leagueoflegends.com/cdn/5.22.1/img/profileicon/749.png" alt="' + champname +'"/></td>';
-        row += '<td class="tdHeaderValue">' + kills + '</td>';
-        row += '<td class="tdHeaderValue">' + deaths + '</td>';
-        row += '<td class="tdHeaderValue">' + assists + '</td>';
-        row += '<td class="tdHeaderValue">' + kda + '</td>';
-        row += '<td class="tdHeaderValue">' + wins + '</td>';
-        row += '<td class="tdHeaderValue">' + games + '</td>';
-        row += '<td class="tdHeaderValue">' + cs + '</td>';
-        row += '<td class="tdHeaderValue">' + avgcs + '</td>';
-        row += '<td class="tdHeaderValue">' + gold + '</td>';
-        row += '<td class="tdHeaderValue">' + avggold + '</td>';
-        row += '<td class="tdHeaderValue"> - </td>';
-    } else {
-        row += '<td class="tdChampSquare"><input type="hidden" name="name" value=' + champname + '><img class="imgSmallSquare" src="http://ddragon.leagueoflegends.com/cdn/5.22.1/img/champion/' + champname + '.png" alt="' + champname +'"/></td>';
-        row += '<td class="tdHeaderValue"><input type="text" name="kills" value=' + kills + '></input></td>';
-        row += '<td class="tdHeaderValue"><input type="text" name="deaths" value=' + deaths + '></input></td>';
-        row += '<td class="tdHeaderValue"><input type="text" name="assists" value=' + assists + '></input></td>';
-        row += '<td class="tdHeaderValue"> - </input></td>';
-        row += '<td class="tdHeaderValue"><input type="text" name="wins" value=' + wins + '></input></td>';
-        row += '<td class="tdHeaderValue"><input type="text" name="games" value=' + games + '></input></td>';
-        row += '<td class="tdHeaderValue"><input type="text" name="cs" value=' + cs + '></input></td>';
-        row += '<td class="tdHeaderValue"> - </input></td>';
-        row += '<td class="tdHeaderValue"><input type="text" name="gold" value=' + gold + '></input></td>';
-        row += '<td class="tdHeaderValue"> - </input></td>';
-        row += '<td class="tdHeaderValue"><a href="#" class="linkdeletechamp" rel="' + id + "#" + champname + '">X</a></td>';
-    }
-
-    row += '</tr>';
-    return row;
-}
 
 function updateChampions() {
     event.preventDefault();
@@ -313,6 +263,7 @@ function deleteChampion() {
 function toggleShowChampions() {
     var pid = $(this).attr('rel');
     $("#container_" + pid + " .playerTable tr").each(function(i, row) {
+    
     // Skip header and TOP values
     if(i > 1) {
         $(row).toggle("fast");
@@ -340,9 +291,9 @@ function populateTableRows(player, shouldHideChampions) {
     for(var i = 0; i < player.champions.length; i++) {
 
         var champ = player.champions[i];
-        var row = getChampionFormatedRow (player._id, champ.name, champ.kills, champ.deaths, 
-                    champ.assists, champ.kda, champ.wins, champ.games,
-                    champ.cs,champ.avgcs,champ.gold,champ.avggold, shouldHideChampions);
+        var row = getChampionRow(player._id, champ.name, champ.kills, champ.deaths, 
+                                champ.assists, champ.wins, champ.games,
+                                champ.cs, champ.gold, shouldHideChampions);
 
         champ.name, 
         tKills += parseInt(champ.kills); 
@@ -359,8 +310,8 @@ function populateTableRows(player, shouldHideChampions) {
     tAvgCs = Math.round(tCs / tGames);
     tAvgGold = Math.round(tGold / tGames);
 
-    var tRow = getChampionFormatedRow (player._id, "profile", tKills, tDeaths, tAssists, tKda, tWins, 
-        tGames,tCs,tAvgCs,tGold, tAvgGold, false);
+    var tRow = getPlayerHeaderRow(player._id, player.iconId, tKills, tDeaths, tAssists, tKda, tWins, 
+                                tGames, tCs, tAvgCs, tGold, tAvgGold);
 
     ret += tRow;
     ret += body;
