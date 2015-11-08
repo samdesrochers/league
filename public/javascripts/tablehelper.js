@@ -1,6 +1,6 @@
 function getStatsHeaderRow() {
     var row = ""
-    row += '<tr class="playerTableRow1">';
+    row += '<tr class="playerTableHeader">';
     row += '<td class="tdHeaderTitle"></td>';
     row += '<td class="tdHeaderTitle">Kills</td>';
     row += '<td class="tdHeaderTitle">Deaths</td>';
@@ -19,6 +19,7 @@ function getStatsHeaderRow() {
 
 function getNewPlayerRow(id, name, iconid) {
     var row = ""
+    row += '<tr class="playerTotalRow">';
     row += '<td class="tdChampSquare"><img class="imgSmallSquare" src="http://ddragon.leagueoflegends.com/cdn/5.22.1/img/profileicon/' + iconid + '.png" alt="' + name +'"/></td>';
     row += '<td class="tdHeaderValue">0</td>';
     row += '<td class="tdHeaderValue">0</td>';
@@ -31,11 +32,13 @@ function getNewPlayerRow(id, name, iconid) {
     row += '<td class="tdHeaderValue">0</td>';
     row += '<td class="tdHeaderValue">0</td>';
     row += '<td class="tdHeaderValue"> - </td>';
+    row += '</tr>';
     return row;
 }
 
 function getPlayerHeaderRow(id, iconid, kills, deaths, assists, kda, wins, games, cs, avgcs, gold, avggold) {
     var row = ""
+    row += '<tr class="playerTotalRow">';
     row += '<td class="tdChampSquare"><img class="imgSmallSquare" src="http://ddragon.leagueoflegends.com/cdn/5.22.1/img/profileicon/'+ iconid +'.png" alt="' + iconid +'"/></td>';
     row += '<td class="tdHeaderValue">' + kills + '</td>';
     row += '<td class="tdHeaderValue">' + deaths + '</td>';
@@ -48,6 +51,7 @@ function getPlayerHeaderRow(id, iconid, kills, deaths, assists, kda, wins, games
     row += '<td class="tdHeaderValue">' + gold + '</td>';
     row += '<td class="tdHeaderValue">' + avggold + '</td>';
     row += '<td class="tdHeaderValue"> - </td>';
+    row += '</tr>';
     return row;
 }
 

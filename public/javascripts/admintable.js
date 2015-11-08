@@ -33,7 +33,7 @@ function populateTable(shouldHideChampions) {
             try{
 
                 tableContent += '<div class="playerContainer" id="container_' + this._id +'"">';
-                tableContent += '<div class="playerName"><a href="#" class="linkshowuser" rel="' + this.name + '"># ' + index++ + " " + this.name + '</a> - <a href="#" class="linkdeleteuser" rel="' + this._id + '">delete</a></div>';
+                tableContent += '<div class="playerName"><a href="#" class="linkshowuser" rel="' + this.name + '">#' + index++ + ": " + this.name + '</a> - <a href="#" class="linkdeleteuser" rel="' + this._id + '">delete</a></div>';
                 tableContent += '<table class="playerTable">';
 
                 // If this user has champions, populate them
@@ -53,7 +53,7 @@ function populateTable(shouldHideChampions) {
 
                 // Add operations bar for each player
                 tableContent += '</table>';
-                tableContent += '<div><a href="#" class="linkaddchampion" rel="' + this._id + '">Add Champion</a> | <a href="#" class="linkupdatechamps" rel="' + this._id + '">Update Champions</a> <a href="#" class="linkshowchamps" rel="' + this._id + '">Toggle Champions</a></div>';
+                tableContent += '<div class="champOps"><a href="#" class="linkaddchampion" rel="' + this._id + '">Add Champion</a> | <a href="#" class="linkupdatechamps" rel="' + this._id + '">Update Champions</a> | <a href="#" class="linkshowchamps" rel="' + this._id + '">Toggle Champions</a></div>';
                 tableContent += '</div>';
 
             } catch(e) {
@@ -63,6 +63,7 @@ function populateTable(shouldHideChampions) {
 
         // Inject the whole content string into our existing HTML table
         $('#leaderboard').html(tableContent);
+
 
         $('.linkdeleteuser').click(deleteUser);
         $('.linkaddchampion').click(addNewChampion);
