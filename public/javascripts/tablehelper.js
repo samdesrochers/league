@@ -58,6 +58,10 @@ function getPlayerHeaderRow(id, iconid, kills, deaths, assists, kda, wins, games
 
 function getChampionRow(id, champname, kills, deaths, assists, wins, games, cs, gold, hidden) {
     var row = '';
+    var gamesInt = parseInt(games);
+    var kda = Math.round((parseInt(kills) + parseInt(assists)) / Math.max(1, parseInt(deaths))); //(K+A) / Max(1,D)
+    var csPerGame = Math.round(parseInt(cs)/gamesInt);
+    var goldPerGame = Math.round(parseInt(gold)/gamesInt);
 
     if(hidden) {
         row += '<tr class="playerTableRowN canHide" style="display:none">';
@@ -70,26 +74,26 @@ function getChampionRow(id, champname, kills, deaths, assists, wins, games, cs, 
         row += '<td class="tdHeaderValue"><input type="text" name="kills" value=' + kills + '></input></td>';
         row += '<td class="tdHeaderValue"><input type="text" name="deaths" value=' + deaths + '></input></td>';
         row += '<td class="tdHeaderValue"><input type="text" name="assists" value=' + assists + '></input></td>';
-        row += '<td class="tdHeaderValue"> - </input></td>';
+        row += '<td class="tdHeaderValue">' + kda + ' </input></td>';
         row += '<td class="tdHeaderValue"><input type="text" name="wins" value=' + wins + '></input></td>';
         row += '<td class="tdHeaderValue"><input type="text" name="games" value=' + games + '></input></td>';
         row += '<td class="tdHeaderValue"><input type="text" name="cs" value=' + cs + '></input></td>';
-        row += '<td class="tdHeaderValue"> - </input></td>';
+        row += '<td class="tdHeaderValue"> ' + csPerGame + ' </input></td>';
         row += '<td class="tdHeaderValue"><input type="text" name="gold" value=' + gold + '></input></td>';
-        row += '<td class="tdHeaderValue"> - </input></td>';
+        row += '<td class="tdHeaderValue"> ' + goldPerGame + ' </input></td>';
         row += '<td class="tdHeaderValue"><a href="#" class="linkdeletechamp" rel="' + id + "#" + champname + '">X</a></td>';
     } else {
         row += '<td class="tdChampSquare"><input type="hidden" name="name" value=' + champname + '><img class="imgSmallSquare" src="http://ddragon.leagueoflegends.com/cdn/5.22.1/img/champion/' + champname + '.png" alt="' + champname +'"/></td>';
         row += '<td class="tdHeaderValue"><input type="text" name="kills" value=' + kills + '></input></td>';
         row += '<td class="tdHeaderValue"><input type="text" name="deaths" value=' + deaths + '></input></td>';
         row += '<td class="tdHeaderValue"><input type="text" name="assists" value=' + assists + '></input></td>';
-        row += '<td class="tdHeaderValue"> - </input></td>';
+        row += '<td class="tdHeaderValue">' + kda + ' </input></td>';
         row += '<td class="tdHeaderValue"><input type="text" name="wins" value=' + wins + '></input></td>';
         row += '<td class="tdHeaderValue"><input type="text" name="games" value=' + games + '></input></td>';
         row += '<td class="tdHeaderValue"><input type="text" name="cs" value=' + cs + '></input></td>';
-        row += '<td class="tdHeaderValue"> - </input></td>';
+        row += '<td class="tdHeaderValue"> ' + csPerGame + ' </input></td>';
         row += '<td class="tdHeaderValue"><input type="text" name="gold" value=' + gold + '></input></td>';
-        row += '<td class="tdHeaderValue"> - </input></td>';
+        row += '<td class="tdHeaderValue"> ' + goldPerGame + ' </input></td>';
         row += '<td class="tdHeaderValue"><a href="#" class="linkdeletechamp" rel="' + id + "#" + champname + '">X</a></td>';
     }
 
