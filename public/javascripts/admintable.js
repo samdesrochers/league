@@ -26,7 +26,6 @@ function populateTable(shouldHideChampions) {
         // Stick our user data array into a userlist variable in the global object
         userListData = data;
 
-
         var index = 1;
         // For each item in our JSON, add a table row and cells to the content string
         $.each(data, function(){
@@ -35,6 +34,7 @@ function populateTable(shouldHideChampions) {
                 tableContent += '<div class="playerContainer" id="container_' + this._id +'"">';
                 tableContent += '<div class="playerName"><a href="#" class="linkshowuser" rel="' + this.name + '">#' + index++ + ": " + this.name + '</a> - <a href="#" class="linkdeleteuser" rel="' + this._id + '">delete</a></div>';
                 tableContent += '<table class="playerTable">';
+                tableContent += getStatsHeaderRow();
 
                 // If this user has champions, populate them
                 if(this.champions !== undefined && this.champions !== null) {
@@ -44,11 +44,9 @@ function populateTable(shouldHideChampions) {
                         this.champions = championsJSON;
                     } catch(e) { }
 
-                    tableContent += getStatsHeaderRow();
                     tableContent += populateTableRows(this, shouldHideChampions);
                 } else {
-                    tableContent += getStatsHeaderRow();
-                    tableContent += getNewPlayerRow(this._id, this.name, this.iconId);
+                    tableContent += getNewPlayerRow(this._id, this.name, this.iconId, this.lastUpdated);
                 }
 
                 // Add operations bar for each player
@@ -75,14 +73,15 @@ function populateTable(shouldHideChampions) {
 
 // Add User
 function addPlayer(event) {
-    event.preventDefault();
 
+    event.preventDefault();
     var errorCount = 0;
     $('#btnAddPlayer input').each(function(index, val) {
         if($(this).val() === '') { errorCount++; }
     });
 
     var name = $('fieldset input#inputPlayerName').val();
+    var createdDate = new Date().toISOString();
 
     // Get Summoner id from RIOT
     $.getJSON( '/riot/summonerid/' + name, function( data ) {      
@@ -95,9 +94,12 @@ function addPlayer(event) {
             var summoner = $.parseJSON(data);
             
             var newPlayer = {
-                name: name,
+                name: summoner.name,
                 iconId: summoner.profileIconId,
-                champions: []
+                lastUpdated: createdDate,
+                creationTime: createdDate,
+                champions: [],
+                totalWins: 0
             }
 
             // Use AJAX to post the object to our adduser service
@@ -125,6 +127,7 @@ function addPlayer(event) {
 
 // Delete User
 function deleteUser(event) {
+
     event.preventDefault();
     var confirmation = confirm('Are you sure you want to delete this user?');
 
@@ -154,13 +157,15 @@ function addNewChampion(event) {
     event.preventDefault();
 
     var pid = $(this).attr('rel');
+    var date = new Date().toISOString();
     var container = $("#container_" + pid + " .playerTable");
-    var newChampRow = getChampionRow(pid, null, 2, 1, 4, 6, 4, 333, 340, false);
+    var newChampRow = getChampionRow(pid, null, 2, 1, 4, 6, 4, 333, 340, date, false);
 
     container.append(newChampRow);
 };
 
 function updateChampions() {
+
     event.preventDefault();
     var pid = $(this).attr('rel');
     var player = null;
@@ -170,7 +175,10 @@ function updateChampions() {
         }
     }
 
+    var tWins = 0;
     var updatedChampions = [];
+    var updateDate = new Date().toISOString();
+
     $("#container_" + pid + " .playerTable tr").each(function(i, row) {
         // Skip header and TOP values
         if(i > 1) {
@@ -184,19 +192,23 @@ function updateChampions() {
                 games : $(row).find("input[name='games']").val(),
                 cs : $(row).find("input[name='cs']").val(),
                 gold : $(row).find("input[name='gold']").val(),
+                lastUpdated : updateDate
             }
 
             updatedChampions.push(champion);
+            tWins += parseInt($(row).find("input[name='wins']").val());
         }
     });
 
     player.champions = updatedChampions;
+    player.lastUpdated = updateDate;
+
     var json = JSON.stringify(player.champions);
 
     // Use AJAX to post the object to our update service
     $.ajax({
         type: 'PUT',
-        data:{champions:json},
+        data:{champions:json, date:updateDate, totalWins:tWins},
         url: '/users/updateuser/' + pid,
         dataType: 'JSON'
     }).done(function( response ) {
@@ -215,6 +227,7 @@ function updateChampions() {
 }
 
 function deleteChampion() {
+
     event.preventDefault();
     var confirmation = confirm('Are you sure you want to delete this champion?');
     if(confirmation === true) {
@@ -262,15 +275,15 @@ function deleteChampion() {
 }
 
 function toggleShowChampions() {
+
     var pid = $(this).attr('rel');
     $("#container_" + pid + " .playerTable tr").each(function(i, row) {
-    
-    // Skip header and TOP values
-    if(i > 1) {
-        $(row).toggle("fast");
-    }
-});
 
+        // Skip header and TOP values
+        if(i > 1) {
+            $(row).toggle("fast");
+        }
+    });
 }
 
 function populateTableRows(player, shouldHideChampions) {
@@ -293,8 +306,9 @@ function populateTableRows(player, shouldHideChampions) {
 
         var champ = player.champions[i];
         var row = getChampionRow(player._id, champ.name, champ.kills, champ.deaths, 
-                                champ.assists, champ.wins, champ.games,
-                                champ.cs, champ.gold, shouldHideChampions);
+            champ.assists, champ.wins, champ.games,
+            champ.cs, champ.gold, champ.lastUpdated, shouldHideChampions);
+        body += row;
 
         champ.name, 
         tKills += parseInt(champ.kills); 
@@ -304,15 +318,13 @@ function populateTableRows(player, shouldHideChampions) {
         tGames += parseInt(champ.games);
         tCs += parseInt(champ.cs);
         tGold += parseInt(champ.gold);
-
-        body += row;
     }
 
     tAvgCs = Math.round(tCs / tGames);
     tAvgGold = Math.round(tGold / tGames);
 
     var tRow = getPlayerHeaderRow(player._id, player.iconId, tKills, tDeaths, tAssists, tKda, tWins, 
-                                tGames, tCs, tAvgCs, tGold, tAvgGold);
+        tGames, tCs, tAvgCs, tGold, tAvgGold, player.lastUpdated);
 
     ret += tRow;
     ret += body;

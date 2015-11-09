@@ -7,9 +7,18 @@ var router = express.Router();
 router.get('/userlist', function(req, res) {
     var db = req.db;
     var collection = db.get('players');
-    collection.find({},{},function(e,docs){
-        res.json(docs);
-    });
+    var options = {
+        "sort": {"totalWins": -1 }
+    };
+
+    try {
+
+        collection.find({}, options, function(e,docs) {
+            res.json(docs);
+        });
+
+    } catch(e) { console.log(e); }
+
 });
 
 /*
@@ -32,9 +41,14 @@ router.post('/adduser', function(req, res) {
 router.put('/updateuser/:id', function(req, res) {
     var db = req.db;
     var collection = db.get('players');
+    console.log(req.body);
     collection.update(
         { '_id' : req.params.id }, 
-        { $set:{'champions' : req.body.champions} },
+        { $set: { 'champions' : req.body.champions, 
+                 'lastUpdated' : req.body.date,
+                 'totalWins' : req.body.totalWins
+                } 
+        },
         function(err, result){
         res.send(
             (err === null) ? { msg: '' } : { msg: err }

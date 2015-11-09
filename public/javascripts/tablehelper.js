@@ -12,12 +12,14 @@ function getStatsHeaderRow() {
     row += '<td class="tdHeaderTitle">CS/Games</td>';
     row += '<td class="tdHeaderTitle">Gold</td>';
     row += '<td class="tdHeaderTitle">Gold/Games</td>';
+    row += '<td class="tdHeaderTitle">Last Update</td>';
     row += '<td class="tdHeaderTitle">Delete</td>';
     row += '</tr>';
     return row;
 }
 
-function getNewPlayerRow(id, name, iconid) {
+function getNewPlayerRow(id, name, iconid, date) {
+    var formattedDate = getFormattedDate(date);
     var row = ""
     row += '<tr class="playerTotalRow">';
     row += '<td class="tdChampSquare"><img class="imgSmallSquare" src="http://ddragon.leagueoflegends.com/cdn/5.22.1/img/profileicon/' + iconid + '.png" alt="' + name +'"/></td>';
@@ -31,12 +33,14 @@ function getNewPlayerRow(id, name, iconid) {
     row += '<td class="tdHeaderValue">0</td>';
     row += '<td class="tdHeaderValue">0</td>';
     row += '<td class="tdHeaderValue">0</td>';
+    row += '<td class="tdHeaderValue">' + formattedDate + '</td>';
     row += '<td class="tdHeaderValue"> - </td>';
     row += '</tr>';
     return row;
 }
 
-function getPlayerHeaderRow(id, iconid, kills, deaths, assists, kda, wins, games, cs, avgcs, gold, avggold) {
+function getPlayerHeaderRow(id, iconid, kills, deaths, assists, kda, wins, games, cs, avgcs, gold, avggold, lastUpdated) {
+    var formattedDate = getFormattedDate(lastUpdated);
     var row = ""
     row += '<tr class="playerTotalRow">';
     row += '<td class="tdChampSquare"><img class="imgSmallSquare" src="http://ddragon.leagueoflegends.com/cdn/5.22.1/img/profileicon/'+ iconid +'.png" alt="' + iconid +'"/></td>';
@@ -50,18 +54,20 @@ function getPlayerHeaderRow(id, iconid, kills, deaths, assists, kda, wins, games
     row += '<td class="tdHeaderValue">' + avgcs + '</td>';
     row += '<td class="tdHeaderValue">' + gold + '</td>';
     row += '<td class="tdHeaderValue">' + avggold + '</td>';
+    row += '<td class="tdHeaderValue">' + formattedDate + '</td>';
     row += '<td class="tdHeaderValue"> - </td>';
     row += '</tr>';
     return row;
 }
 
 
-function getChampionRow(id, champname, kills, deaths, assists, wins, games, cs, gold, hidden) {
+function getChampionRow(id, champname, kills, deaths, assists, wins, games, cs, gold, lastUpdated, hidden) {
     var row = '';
     var gamesInt = parseInt(games);
     var kda = Math.round((parseInt(kills) + parseInt(assists)) / Math.max(1, parseInt(deaths))); //(K+A) / Max(1,D)
     var csPerGame = Math.round(parseInt(cs)/gamesInt);
     var goldPerGame = Math.round(parseInt(gold)/gamesInt);
+    var formattedDate = getFormattedDate(lastUpdated);
 
     if(hidden) {
         row += '<tr class="playerTableRowN canHide" style="display:none">';
@@ -81,6 +87,7 @@ function getChampionRow(id, champname, kills, deaths, assists, wins, games, cs, 
         row += '<td class="tdHeaderValue"> ' + csPerGame + ' </input></td>';
         row += '<td class="tdHeaderValue"><input type="text" name="gold" value=' + gold + '></input></td>';
         row += '<td class="tdHeaderValue"> ' + goldPerGame + ' </input></td>';
+        row += '<td class="tdHeaderValue"> ' + formattedDate + ' </input></td>';
         row += '<td class="tdHeaderValue"><a href="#" class="linkdeletechamp" rel="' + id + "#" + champname + '">X</a></td>';
     } else {
         row += '<td class="tdChampSquare"><input type="hidden" name="name" value=' + champname + '><img class="imgSmallSquare" src="http://ddragon.leagueoflegends.com/cdn/5.22.1/img/champion/' + champname + '.png" alt="' + champname +'"/></td>';
@@ -94,9 +101,26 @@ function getChampionRow(id, champname, kills, deaths, assists, wins, games, cs, 
         row += '<td class="tdHeaderValue"> ' + csPerGame + ' </input></td>';
         row += '<td class="tdHeaderValue"><input type="text" name="gold" value=' + gold + '></input></td>';
         row += '<td class="tdHeaderValue"> ' + goldPerGame + ' </input></td>';
+        row += '<td class="tdHeaderValue"> ' + formattedDate + ' </input></td>';
         row += '<td class="tdHeaderValue"><a href="#" class="linkdeletechamp" rel="' + id + "#" + champname + '">X</a></td>';
     }
 
     row += '</tr>';
     return row;
 }
+
+function getFormattedDate(d) {
+    var date = new Date(d);
+    var day = date.getDate();
+    var monthIndex = date.getMonth();
+    var year = date.getFullYear();
+    return day + ' ' + monthNames[monthIndex] + ' ' + year;
+}
+
+var monthNames = [
+  "Jan", "Feb", "Mar",
+  "Apr", "May", "June", "July",
+  "Aug", "Sep", "Oct",
+  "Nov", "Dec"
+];
+
