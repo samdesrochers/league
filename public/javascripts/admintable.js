@@ -87,11 +87,19 @@ function addPlayer(event) {
     $.getJSON( '/riot/summonerid/' + name, function( data ) {      
         if (data !== undefined) {
 
+            var status = data.status;
+            var response = data.response;
+
+            if(status === "invalid") {
+                alert(response);
+                return false;
+            }
+
             // hack around RIOT Api, for some reason it always return undefined as leading name for spaced summoner names
-            data = data.substring(1, data.length - 1);
-            data = data.substring(data.indexOf('{'), data.length);
-            data = data.replace("undefined", name);
-            var summoner = $.parseJSON(data);
+            response = response.substring(1, response.length - 1);
+            response = response.substring(response.indexOf('{'), response.length);
+            response = response.replace("undefined", name);
+            var summoner = $.parseJSON(response);
             
             var newPlayer = {
                 name: summoner.name,

@@ -5,9 +5,9 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var mongo = require('mongodb');
+var mongo = require('mongodb').MongoClient;
 var monk = require('monk');
-var db = monk('localhost:27017/players');
+var db = monk('mongodb://laliguedb:AJDDLozfoAk4unaPv36Qx0gl1NM3WlBmW8Apwy3sE4E-@ds052408.mongolab.com:52408/laliguedb');
 
 var routes = require('./routes/index');
 var admin = require('./routes/admin');
@@ -29,6 +29,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
 
 // Make our db accessible to our router
 app.use(function(req,res,next){

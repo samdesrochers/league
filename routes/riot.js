@@ -11,18 +11,26 @@ router.get('/summonerid/:name', function(req, res) {
     var url = "https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/" + name + "?api_key=" + apikey;
 
     try{
-        //Lets try to make a HTTP GET request to modulus.io's website.
         request(url, function (error, response, body) {
             if (!error && response.statusCode == 200) {
-                console.log(body); 
-                res.json(body);
+
+                res.json(
+                {
+                    status:"valid", 
+                    response:body
+                });
+
             } else {
-                console.log(body); 
+
+                res.json(
+                {
+                    status:"invalid", 
+                    response:"no summoner data associated with the given player name."
+                });
             }
         });
     } catch(e) {
         console.log(e);
-        console.log(url);
     }
 });
 
