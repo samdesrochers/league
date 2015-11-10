@@ -7,7 +7,8 @@ var bodyParser = require('body-parser');
 
 var mongo = require('mongodb').MongoClient;
 var monk = require('monk');
-var db = monk('mongodb://laliguedb:AJDDLozfoAk4unaPv36Qx0gl1NM3WlBmW8Apwy3sE4E-@ds052408.mongolab.com:52408/laliguedb');
+var db = monk('localhost:27017/players');
+//var db = monk('mongodb://laliguedb:AJDDLozfoAk4unaPv36Qx0gl1NM3WlBmW8Apwy3sE4E-@ds052408.mongolab.com:52408/laliguedb');
 
 var routes = require('./routes/index');
 var admin = require('./routes/admin');

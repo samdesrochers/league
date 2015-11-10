@@ -13,64 +13,6 @@ $(document).ready(function() {
 
 // Functions =============================================================
 
-// Fill table with data
-function populateTable(shouldHideChampions) {
-
-    // Empty content string
-    var tableContent = '';
-    var rowIndex = 0;
-
-    // jQuery AJAX call for JSON
-    $.getJSON( '/users/userlist', function( data ) {
-
-        // Stick our user data array into a userlist variable in the global object
-        userListData = data;
-
-        var index = 1;
-        // For each item in our JSON, add a table row and cells to the content string
-        $.each(data, function(){
-            try{
-
-                tableContent += '<div class="playerContainer" id="container_' + this._id +'"">';
-                tableContent += '<div class="playerName"><a href="#" class="linkshowuser" rel="' + this.name + '">#' + index++ + ": " + this.name + '</a> - <a href="#" class="linkdeleteuser" rel="' + this._id + '">delete</a></div>';
-                tableContent += '<table class="playerTable">';
-                tableContent += getStatsHeaderRow();
-
-                // If this user has champions, populate them
-                if(this.champions !== undefined && this.champions !== null) {
-
-                    try {
-                        var championsJSON = $.parseJSON(this.champions);
-                        this.champions = championsJSON;
-                    } catch(e) { }
-
-                    tableContent += populateTableRows(this, shouldHideChampions);
-                } else {
-                    tableContent += getNewPlayerRow(this._id, this.name, this.iconId, this.lastUpdated);
-                }
-
-                // Add operations bar for each player
-                tableContent += '</table>';
-                tableContent += '<div class="champOps"><a href="#" class="linkaddchampion" rel="' + this._id + '">Add Champion</a> | <a href="#" class="linkupdatechamps" rel="' + this._id + '">Update Champions</a> | <a href="#" class="linkshowchamps" rel="' + this._id + '">Toggle Champions</a></div>';
-                tableContent += '</div>';
-
-            } catch(e) {
-                console.log(e);
-            }
-        });
-
-        // Inject the whole content string into our existing HTML table
-        $('#leaderboard').html(tableContent);
-
-
-        $('.linkdeleteuser').click(deleteUser);
-        $('.linkaddchampion').click(addNewChampion);
-        $('.linkupdatechamps').click(updateChampions);
-        $('.linkshowchamps').click(toggleShowChampions);
-        $('.linkdeletechamp').click(deleteChampion);
-    });
-};
-
 // Add User
 function addPlayer(event) {
 
@@ -167,8 +109,7 @@ function addNewChampion(event) {
     var pid = $(this).attr('rel');
     var date = new Date().toISOString();
     var container = $("#container_" + pid + " .playerTable");
-    var newChampRow = getChampionRow(pid, null, 2, 1, 4, 6, 4, 333, 340, date, false);
-
+    var newChampRow = getNewChampionRow(pid, 2, 1, 4, 6, 4, 333, 340, date, false);
     container.append(newChampRow);
 };
 
@@ -187,30 +128,57 @@ function updateChampions() {
     var updatedChampions = [];
     var updateDate = new Date().toISOString();
 
-    $("#container_" + pid + " .playerTable tr").each(function(i, row) {
-        // Skip header and TOP values
-        if(i > 1) {
+    $("#container_" + pid + " .rowValues").each(function(i, row) {
 
-            var champion = {
-                name : $(row).find("input[name='name']").val(),
-                kills : $(row).find("input[name='kills']").val(),
-                deaths : $(row).find("input[name='deaths']").val(),
-                assists : $(row).find("input[name='assists']").val(),
-                wins : $(row).find("input[name='wins']").val(),
-                games : $(row).find("input[name='games']").val(),
-                cs : $(row).find("input[name='cs']").val(),
-                gold : $(row).find("input[name='gold']").val(),
-                lastUpdated : updateDate
-            }
+        var champion = {
+            name : $(row).find("input[name='name']").val(),
+            kills : $(row).find("input[name='kills']").val(),
+            deaths : $(row).find("input[name='deaths']").val(),
+            assists : $(row).find("input[name='assists']").val(),
+            wins : $(row).find("input[name='wins']").val(),
+            games : $(row).find("input[name='games']").val(),
+            cs : $(row).find("input[name='cs']").val(),
+            gold : $(row).find("input[name='gold']").val(),
+            lastUpdated : updateDate
+        }
 
+        // TODO Better validation
+        if(champion.kills !== "" && champion.wins !== "" && champion.gold !== "") {
             updatedChampions.push(champion);
-            tWins += parseInt($(row).find("input[name='wins']").val());
         }
     });
 
-    player.champions = updatedChampions;
-    player.lastUpdated = updateDate;
+    // Special case: first champion(s) being ever added
+    if(player.champions === undefined || player.champions.length === 0) {
+        player.champions = [];
+        for (var c in updatedChampions) {
+            player.champions.push(updatedChampions[c]);
+        }
 
+    } else {
+
+        for (var i = updatedChampions.length - 1; i >= 0; i--) {
+            var upc = updatedChampions[i];
+            var foundIndex = -1;
+            for (var i = player.champions.length - 1; i >= 0; i--) {
+                var exc = player.champions[i];
+
+                // Champion found in list, keep index
+                if(upc.name === exc.name) {
+                    foundIndex = i;
+                } 
+            };
+            
+            if(foundIndex !== -1) {
+                //TODO  Update values (+)
+                player.champions[foundIndex] = upc;
+            } else {
+                player.champions.push(upc);
+            }
+        };
+    }
+
+    player.lastUpdated = updateDate;
     var json = JSON.stringify(player.champions);
 
     // Use AJAX to post the object to our update service
@@ -294,7 +262,65 @@ function toggleShowChampions() {
     });
 }
 
-function populateTableRows(player, shouldHideChampions) {
+// Fill table with data
+function populateTable(shouldHideChampions) {
+
+    // Empty content string
+    var tableContent = '';
+    var rowIndex = 0;
+
+    // jQuery AJAX call for JSON
+    $.getJSON( '/users/userlist', function( data ) {
+
+        // Stick our user data array into a userlist variable in the global object
+        userListData = data;
+
+        var index = 1;
+        // For each item in our JSON, add a table row and cells to the content string
+        $.each(data, function(){
+            try{
+
+                tableContent += '<div class="playerContainer" id="container_' + this._id +'"">';
+                tableContent += '<div class="playerName"><a href="#" class="linkshowuser" rel="' + this.name + '">#' + index++ + ": " + this.name + '</a> - <a href="#" class="linkdeleteuser" rel="' + this._id + '">delete</a></div>';
+                tableContent += '<table class="playerTable">';
+                tableContent += getStatsHeaderRow();
+
+                // If this user has champions, populate them
+                if(this.champions !== undefined && this.champions !== null) {
+
+                    var championsJSON = $.parseJSON(this.champions);
+                    this.champions = championsJSON;
+                    tableContent += populateRows(this, shouldHideChampions);
+
+                } else {
+
+                    tableContent += getNewPlayerRow(this._id, this.name, this.iconId, this.lastUpdated);
+                    
+                }
+
+                // Add operations bar for each player
+                tableContent += '</table>';
+                tableContent += '<div class="champOps"><a href="#" class="linkaddchampion" rel="' + this._id + '">Add Champion</a> | <a href="#" class="linkupdatechamps" rel="' + this._id + '">Update Champions</a> | <a href="#" class="linkshowchamps" rel="' + this._id + '">Toggle Champions</a></div>';
+                tableContent += '</div>';
+
+            } catch(e) {
+                console.log(e);
+            }
+        });
+
+        // Inject the whole content string into our existing HTML table
+        $('#leaderboard').html(tableContent);
+
+
+        $('.linkdeleteuser').click(deleteUser);
+        $('.linkaddchampion').click(addNewChampion);
+        $('.linkupdatechamps').click(updateChampions);
+        $('.linkshowchamps').click(toggleShowChampions);
+        $('.linkdeletechamp').click(deleteChampion);
+    });
+};
+
+function populateRows(player, shouldHideChampions) {
 
     var tKills = 0;
     var tDeaths = 0;
@@ -313,10 +339,12 @@ function populateTableRows(player, shouldHideChampions) {
     for(var i = 0; i < player.champions.length; i++) {
 
         var champ = player.champions[i];
-        var row = getChampionRow(player._id, champ.name, champ.kills, champ.deaths, 
+        var inputRow = getChampionInputRow(champ.name, shouldHideChampions);
+        var statsRow = getChampionRow(player._id, champ.name, champ.kills, champ.deaths, 
             champ.assists, champ.wins, champ.games,
             champ.cs, champ.gold, champ.lastUpdated, shouldHideChampions);
-        body += row;
+        body += statsRow;
+        body += inputRow;
 
         champ.name, 
         tKills += parseInt(champ.kills); 
