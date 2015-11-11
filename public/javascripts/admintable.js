@@ -1,5 +1,6 @@
 // Userlist data array for filling in info box
-var userListData = [];
+var playerListData = [];
+var lastHiddenState = true;
 
 // DOM Ready =============================================================
 $(document).ready(function() {
@@ -8,13 +9,11 @@ $(document).ready(function() {
     populateTable(true);
 
     // Add User button click
-    $('#btnAddPlayer').on('click', addPlayer);
+    $('#btnAddPlayer').on('click', createPlayer);
 });
 
-// Functions =============================================================
-
-// Add User
-function addPlayer(event) {
+// =============================================================
+function createPlayer(event) {
 
     event.preventDefault();
     var errorCount = 0;
@@ -61,7 +60,7 @@ function addPlayer(event) {
             }).done(function( response ) {
                 if (response.msg === '') {
                     $('fieldset input').val('');
-                    populateTable(true);
+                    populateTable();
                 }
                 else {
                     alert('Error: ' + response.msg);
@@ -75,8 +74,8 @@ function addPlayer(event) {
     });
 };
 
-// Delete User
-function deleteUser(event) {
+// =============================================================
+function deletePlayer(event) {
 
     event.preventDefault();
     var confirmation = confirm('Are you sure you want to delete this user?');
@@ -101,8 +100,8 @@ function deleteUser(event) {
     }
 };
 
-// Add New Champion
-function addNewChampion(event) {
+// =============================================================
+function createNewChampion(event) {
 
     event.preventDefault();
 
@@ -113,14 +112,15 @@ function addNewChampion(event) {
     container.append(newChampRow);
 };
 
+// =============================================================
 function updateChampions() {
 
     event.preventDefault();
     var pid = $(this).attr('rel');
     var player = null;
-    for(var i = 0; i < userListData.length; i++) {
-        if(userListData[i]._id === pid) {
-            player = userListData[i];
+    for(var i = 0; i < playerListData.length; i++) {
+        if(playerListData[i]._id === pid) {
+            player = playerListData[i];
         }
     }
 
@@ -192,7 +192,7 @@ function updateChampions() {
         if (response.msg === '') {
 
             // Update the table
-            populateTable(false);
+            populateTable();
         }
         else {
             // If something goes wrong, alert the error message that our service returned
@@ -202,6 +202,7 @@ function updateChampions() {
     });
 }
 
+// =============================================================
 function deleteChampion() {
 
     event.preventDefault();
@@ -211,9 +212,9 @@ function deleteChampion() {
         var pid = ids[0];
         var toDelete = ids[1];
         var player = null;
-        for(var i = 0; i < userListData.length; i++) {
-            if(userListData[i]._id === pid) {
-                player = userListData[i];
+        for(var i = 0; i < playerListData.length; i++) {
+            if(playerListData[i]._id === pid) {
+                player = playerListData[i];
             }
         }
 
@@ -237,7 +238,7 @@ function deleteChampion() {
             if (response.msg === '') {
 
                 // Update the table
-                populateTable(false);
+                populateTable();
             }
             else {
                 // If something goes wrong, alert the error message that our service returned
@@ -250,6 +251,7 @@ function deleteChampion() {
     }
 }
 
+// =============================================================
 function toggleShowChampions() {
 
     var pid = $(this).attr('rel');
@@ -262,20 +264,19 @@ function toggleShowChampions() {
     });
 }
 
-// Fill table with data
+// =============================================================
 function populateTable(shouldHideChampions) {
 
-    // Empty content string
-    var tableContent = '';
-    var rowIndex = 0;
+    lastHiddenState = shouldHideChampions;
 
     // jQuery AJAX call for JSON
     $.getJSON( '/users/userlist', function( data ) {
 
         // Stick our user data array into a userlist variable in the global object
-        userListData = data;
-
+        playerListData = data;
         var index = 1;
+        var tableContent = '';
+
         // For each item in our JSON, add a table row and cells to the content string
         $.each(data, function(){
             try{
@@ -311,15 +312,15 @@ function populateTable(shouldHideChampions) {
         // Inject the whole content string into our existing HTML table
         $('#leaderboard').html(tableContent);
 
-
-        $('.linkdeleteuser').click(deleteUser);
-        $('.linkaddchampion').click(addNewChampion);
+        $('.linkdeleteuser').click(deletePlayer);
+        $('.linkaddchampion').click(createNewChampion);
         $('.linkupdatechamps').click(updateChampions);
-        $('.linkshowchamps').click(toggleShowChampions);
         $('.linkdeletechamp').click(deleteChampion);
+        $('.linkshowchamps').click(toggleShowChampions);
     });
 };
 
+// =============================================================
 function populateRows(player, shouldHideChampions) {
 
     var tKills = 0;
@@ -327,11 +328,11 @@ function populateRows(player, shouldHideChampions) {
     var tAssists = 0;
     var tKda = 0;
     var tWins = 0;
-    var tGames = 0;
     var tCs = 0;
     var tAvgCs = 0;
     var tGold = 0;
     var tAvgGold = 0;
+    var tGames = 0;
 
     var ret = "";
     var body = "";
@@ -340,9 +341,10 @@ function populateRows(player, shouldHideChampions) {
 
         var champ = player.champions[i];
         var inputRow = getChampionInputRow(champ.name, shouldHideChampions);
-        var statsRow = getChampionRow(player._id, champ.name, champ.kills, champ.deaths, 
-            champ.assists, champ.wins, champ.games,
-            champ.cs, champ.gold, champ.lastUpdated, shouldHideChampions);
+        var statsRow = getChampionRow (
+                        player._id, champ.name, champ.kills, champ.deaths, 
+                        champ.assists, champ.wins, champ.games,
+                        champ.cs, champ.gold, champ.lastUpdated, shouldHideChampions);
         body += statsRow;
         body += inputRow;
 
@@ -356,10 +358,15 @@ function populateRows(player, shouldHideChampions) {
         tGold += parseInt(champ.gold);
     }
 
-    tAvgCs = Math.round(tCs / tGames);
-    tAvgGold = Math.round(tGold / tGames);
+    if(tGames === 0) {
+        tAvgCs = tAvgGold = tKda = 0;
+    } else {
+        tAvgCs = Math.max(Math.round(tCs / tGames), 0);
+        tAvgGold = Math.max(Math.round(tGold / tGames), 0);
+        tKda = Math.round((parseInt(tKills) + parseInt(tAssists)) / Math.max(1, parseInt(tDeaths))); //(K+A) / Max(1,D)
+    }
 
-    var tRow = getPlayerHeaderRow(player._id, player.iconId, tKills, tDeaths, tAssists, tKda, tWins, 
+    var tRow = getPlayerStatsRow(player._id, player.iconId, tKills, tDeaths, tAssists, tKda, tWins, 
         tGames, tCs, tAvgCs, tGold, tAvgGold, player.lastUpdated);
 
     ret += tRow;

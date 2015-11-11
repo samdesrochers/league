@@ -1,3 +1,4 @@
+//-----------------------------------------------------------
 function getStatsHeaderRow() {
     var row = ""
     row += '<tr class="playerTableHeader">';
@@ -18,6 +19,7 @@ function getStatsHeaderRow() {
     return row;
 }
 
+//-----------------------------------------------------------
 function getNewPlayerRow(id, name, iconid, date) {
     var formattedDate = getFormattedDate(date);
     var row = ""
@@ -39,7 +41,8 @@ function getNewPlayerRow(id, name, iconid, date) {
     return row;
 }
 
-function getPlayerHeaderRow(id, iconid, kills, deaths, assists, kda, wins, games, cs, avgcs, gold, avggold, lastUpdated) {
+//-----------------------------------------------------------
+function getPlayerStatsRow(id, iconid, kills, deaths, assists, kda, wins, games, cs, avgcs, gold, avggold, lastUpdated) {
     var formattedDate = getFormattedDate(lastUpdated);
     var row = ""
     row += '<tr class="playerTotalRow">';
@@ -60,7 +63,7 @@ function getPlayerHeaderRow(id, iconid, kills, deaths, assists, kda, wins, games
     return row;
 }
 
-
+//-----------------------------------------------------------
 function getNewChampionRow(id, kills, deaths, assists, wins, games, cs, gold, lastUpdated, hidden) {
     
     var formattedDate = getFormattedDate(lastUpdated);
@@ -83,13 +86,14 @@ function getNewChampionRow(id, kills, deaths, assists, wins, games, cs, gold, la
     return row;
 }
 
+//-----------------------------------------------------------
 function getChampionInputRow(champname, hidden) {
     var row = '';
 
     if(hidden) {
-        row += '<tr class="playerTableRowN rowValues canHide" style="display:none">';
+        row += '<tr class="rowValues canHide" style="display:none">';
     } else {
-        row += '<tr class="playerTableRowN rowValues">';
+        row += '<tr class="rowValues">';
     }
 
     // Input per champion
@@ -110,6 +114,7 @@ function getChampionInputRow(champname, hidden) {
     return row;
 }
 
+//-----------------------------------------------------------
 function getChampionRow(id, champname, kills, deaths, assists, wins, games, cs, gold, lastUpdated, hidden) {
     var row = '';
     var gamesInt = parseInt(games);
@@ -119,14 +124,18 @@ function getChampionRow(id, champname, kills, deaths, assists, wins, games, cs, 
     var formattedDate = getFormattedDate(lastUpdated);
 
 
-    row += '<tr class="playerTableRowN">';
+    if(hidden) {
+        row += '<tr class="rowValues canHide" style="display:none">';
+    } else {
+        row += '<tr class="rowValues">';
+    }
     
     // Header per champion
-    row += '<td class="tdChampSquare"><input type="hidden" name="name" value=' + champname + '><img class="imgSmallSquare" src="http://ddragon.leagueoflegends.com/cdn/5.22.1/img/champion/' + champname + '.png" alt="' + champname +'"/></td>';
+    row += '<td class="tdChampSquare"><input type="hidden" name="name" value=' + champname + '><img class="imgSmallSquare" src="http://ddragon.leagueoflegends.com/cdn/5.22.1/img/champion/' + champname + '.png" alt="' + champname +'" title="' + champname + '"/></td>';
     row += '<td class="tdHeaderValue">' + kills + '</td>';
     row += '<td class="tdHeaderValue">' + deaths + '</td>';
     row += '<td class="tdHeaderValue">' + assists + '</td>';
-    row += '<td class="tdHeaderValue">' + kda + ' </input></td>';
+    row += '<td class="tdHeaderValue">' + kda + '</td>';
     row += '<td class="tdHeaderValue">' + wins + '</td>';
     row += '<td class="tdHeaderValue">' + games + '</td>';
     row += '<td class="tdHeaderValue">' + cs + '</td>';
@@ -140,14 +149,7 @@ function getChampionRow(id, champname, kills, deaths, assists, wins, games, cs, 
     return row;
 }
 
-function getFormattedDate(d) {
-    var date = new Date(d);
-    var day = date.getDate();
-    var monthIndex = date.getMonth();
-    var year = date.getFullYear();
-    return day + ' ' + monthNames[monthIndex] + ' ' + year;
-}
-
+//-----------------------------------------------------------
 var monthNames = [
   "Jan", "Feb", "Mar",
   "Apr", "May", "June", "July",
@@ -155,3 +157,10 @@ var monthNames = [
   "Nov", "Dec"
 ];
 
+function getFormattedDate(d) {
+    var date = new Date(d);
+    var day = date.getDate();
+    var monthIndex = date.getMonth();
+    var year = date.getFullYear();
+    return day + ' ' + monthNames[monthIndex] + ' ' + year;
+}
