@@ -1,34 +1,34 @@
 var express = require('express');
 var router = express.Router();
+var Player = require('../models/player');
 
 /*
  * GET userlist.
  */
 router.get('/userlist', function(req, res) {
-    var db = req.db;
-    var collection = db.get('players');
-    var options = {
-        "sort": {"totalWins": -1 }
-    };
-
-    try {
-
-        collection.find({}, options, function(e,docs) {
-            res.json(docs);
-        });
-
-    } catch(e) { console.log(e); }
-
+    Player.find( {}, null, { sort: {totalWins: -1}}, function (err, players) {
+        if (err) return console.log(err);
+        res.json(players);
+    });
 });
 
 /*
  * POST new user.
  */
 router.post('/adduser', function(req, res) {
-    var db = req.db;
-    var collection = db.get('players');
-    console.log(req.body);
-    collection.insert(req.body, function(err, result){
+    var newPlayer = new Player({ name: req.body.name, 
+        iconId: req.body.iconId, 
+        lastUpdated: req.body.lastUpdated,
+        totalWins: 0,
+        champions: []
+    });
+
+    newPlayer.save(function (err, newPlayer) {
+        if(err) { 
+            return console.error(err);
+        }
+
+        console.log("[CREATE SUCCES] New player " + newPlayer.name + " saved.");
         res.send(
             (err === null) ? { msg: '' } : { msg: err }
         );
@@ -39,20 +39,22 @@ router.post('/adduser', function(req, res) {
  * PUT existing user.
  */
 router.put('/updateuser/:id', function(req, res) {
-    var db = req.db;
-    var collection = db.get('players');
-    console.log(req.body);
-    collection.update(
-        { '_id' : req.params.id }, 
-        { $set: { 'champions' : req.body.champions, 
-                 'lastUpdated' : req.body.date,
-                 'totalWins' : req.body.totalWins
-                } 
-        },
-        function(err, result){
-        res.send(
-            (err === null) ? { msg: '' } : { msg: err }
-        );
+
+    var playerId = req.params.id;
+    Player.findById(playerId, function(err, player) {
+        if (err) {
+            return console.log(err);
+        }
+
+        player.champions = req.body.champions;
+        player.lastUpdated = req.body.date;
+        player.totalWins = req.body.totalWins;
+
+        player.save(function (err) {
+            res.send(
+                (err === null) ? { msg: '' } : { msg: err }
+            );       
+        });
     });
 });
 
@@ -60,10 +62,8 @@ router.put('/updateuser/:id', function(req, res) {
  * DELETE existing user.
  */
 router.delete('/deleteuser/:id', function(req, res) {
-    var db = req.db;
-    var collection = db.get('players');
-    var userToDelete = req.params.id;
-    collection.remove({ '_id' : userToDelete }, function(err) {
+    var playerId = req.params.id;
+    Player.remove({ '_id' : playerId }, function(err) {
         res.send((err === null) ? { msg: '' } : { msg:'error: ' + err });
     });
 });

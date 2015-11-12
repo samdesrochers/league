@@ -1,4 +1,3 @@
-// Userlist data array for filling in info box
 var playerListData = [];
 var lastHiddenState = true;
 
@@ -166,6 +165,7 @@ function updateChampions() {
         player.champions = [];
         for (var c in updatedChampions) {
             player.champions.push(updatedChampions[c]);
+            tWins += updatedChampions[c].wins;
         }
 
     } else {
@@ -192,6 +192,7 @@ function updateChampions() {
                 updatingc.cs += parseInt(existingc.cs);
                 updatingc.gold += parseInt(existingc.gold);
                 player.champions[foundIndex] = updatingc;
+                tWins += updatingc.wins;
             } else {
                 player.champions.push(updatingc);
             }
@@ -307,7 +308,7 @@ function populateTable(shouldHideChampions) {
                 tableContent += getStatsHeaderRow();
 
                 // If this user has champions, populate them
-                if(this.champions !== undefined && this.champions !== null) {
+                if(this.champions !== undefined && this.champions.length > 0) {
 
                     var championsJSON = $.parseJSON(this.champions);
                     this.champions = championsJSON;
