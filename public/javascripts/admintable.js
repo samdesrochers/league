@@ -132,19 +132,32 @@ function updateChampions() {
 
         var champion = {
             name : $(row).find("input[name='name']").val(),
-            kills : $(row).find("input[name='kills']").val(),
-            deaths : $(row).find("input[name='deaths']").val(),
-            assists : $(row).find("input[name='assists']").val(),
-            wins : $(row).find("input[name='wins']").val(),
-            games : $(row).find("input[name='games']").val(),
-            cs : $(row).find("input[name='cs']").val(),
-            gold : $(row).find("input[name='gold']").val(),
+            kills : parseInt($(row).find("input[name='kills']").val()),
+            deaths : parseInt($(row).find("input[name='deaths']").val()),
+            assists : parseInt($(row).find("input[name='assists']").val()),
+            wins : parseInt($(row).find("input[name='wins']").val()),
+            games : parseInt($(row).find("input[name='games']").val()),
+            cs : parseInt($(row).find("input[name='cs']").val()),
+            gold : parseInt($(row).find("input[name='gold']").val()),
             lastUpdated : updateDate
         }
 
-        // TODO Better validation
-        if(champion.kills !== "" && champion.wins !== "" && champion.gold !== "") {
+        var valid = true;
+        for (var p in champion) {
+            var value = champion[p];
+            if ((typeof value === 'string' || value instanceof String) && value === "") {
+                valid = false;
+                break;
+            } else if((typeof value === 'number' || value instanceof Number) && isNaN(value)) {
+                valid = false;
+                break;
+            }
+        }
+
+        if(valid) {
             updatedChampions.push(champion);
+        } else {
+            // Alert user!!!
         }
     });
 
@@ -158,22 +171,29 @@ function updateChampions() {
     } else {
 
         for (var i = updatedChampions.length - 1; i >= 0; i--) {
-            var upc = updatedChampions[i];
+            var updatingc = updatedChampions[i];
             var foundIndex = -1;
             for (var i = player.champions.length - 1; i >= 0; i--) {
-                var exc = player.champions[i];
+                var existingc = player.champions[i];
 
                 // Champion found in list, keep index
-                if(upc.name === exc.name) {
+                if(updatingc.name === existingc.name) {
                     foundIndex = i;
                 } 
             };
             
             if(foundIndex !== -1) {
-                //TODO  Update values (+)
-                player.champions[foundIndex] = upc;
+                // Update with the latest champion's data after getting the values
+                updatingc.kills += parseInt(existingc.kills);
+                updatingc.deaths += parseInt(existingc.deaths);
+                updatingc.assists += parseInt(existingc.assists);
+                updatingc.wins += parseInt(existingc.wins);
+                updatingc.games += parseInt(existingc.games);
+                updatingc.cs += parseInt(existingc.cs);
+                updatingc.gold += parseInt(existingc.gold);
+                player.champions[foundIndex] = updatingc;
             } else {
-                player.champions.push(upc);
+                player.champions.push(updatingc);
             }
         };
     }

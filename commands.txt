@@ -1,6 +1,8 @@
 Start Server
 mongod --dbpath E:\JS\league\data\
 mongod --dbpath C:\Dev\JavaScript\league\data\
+mongod --dbpath /Users/sam/Documents/Programming/Javascript/league/data/
+
 
 mongo
 use league

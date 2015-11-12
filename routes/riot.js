@@ -1,6 +1,8 @@
 var express = require('express');
 var request = require('request');
 var router = express.Router();
+
+// champions data : http://ddragon.leagueoflegends.com/cdn/5.22.3/data/en_US/champion.json
 var apikey = "b4283e24-9216-4553-9e73-ac664a6a9d8b";
 
 /*
@@ -33,7 +35,5 @@ router.get('/summonerid/:name', function(req, res) {
         console.log(e);
     }
 });
-
-
 
 module.exports = router;
