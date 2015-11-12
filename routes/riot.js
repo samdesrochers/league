@@ -27,7 +27,7 @@ router.get('/summonerid/:name', function(req, res) {
                 res.json(
                 {
                     status:"invalid", 
-                    response:"no summoner data associated with the given player name."
+                    response:"No summoner associated with the given name."
                 });
             }
         });

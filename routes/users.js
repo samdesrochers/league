@@ -2,6 +2,17 @@ var express = require('express');
 var router = express.Router();
 var Player = require('../models/player');
 
+var isAuthenticated = function (req, res, next) {
+
+    // DEBUG
+    return next();
+
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect('/login');
+};
+
 /*
  * GET userlist.
  */
@@ -15,7 +26,7 @@ router.get('/userlist', function(req, res) {
 /*
  * POST new user.
  */
-router.post('/adduser', function(req, res) {
+router.post('/adduser', isAuthenticated, function(req, res) {
     var newPlayer = new Player({ name: req.body.name, 
         iconId: req.body.iconId, 
         lastUpdated: req.body.lastUpdated,
@@ -38,7 +49,7 @@ router.post('/adduser', function(req, res) {
 /*
  * PUT existing user.
  */
-router.put('/updateuser/:id', function(req, res) {
+router.put('/updateuser/:id', isAuthenticated, function(req, res) {
 
     var playerId = req.params.id;
     Player.findById(playerId, function(err, player) {
@@ -61,7 +72,7 @@ router.put('/updateuser/:id', function(req, res) {
 /*
  * DELETE existing user.
  */
-router.delete('/deleteuser/:id', function(req, res) {
+router.delete('/deleteuser/:id', isAuthenticated, function(req, res) {
     var playerId = req.params.id;
     Player.remove({ '_id' : playerId }, function(err) {
         res.send((err === null) ? { msg: '' } : { msg:'error: ' + err });

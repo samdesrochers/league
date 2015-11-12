@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(require('express-session')({ 
-    secret: 'keyboard cat', 
+    secret: 'lavaynecestlapepperonifromagedesadcarry', 
     resave: false, 
     saveUninitialized: false 
 }));

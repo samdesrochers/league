@@ -23,15 +23,18 @@ function createPlayer(event) {
     var name = $('fieldset input#inputPlayerName').val();
     var createdDate = new Date().toISOString();
 
+    if (!isTextValid(name)) {
+        showInfo("Invalid or Empty player name.");
+        return;
+    }
+
     // Get Summoner id from RIOT
     $.getJSON( '/riot/summonerid/' + name, function( data ) {      
-        if (data !== undefined) {
-
+        if (data !== undefined) {            
             var status = data.status;
             var response = data.response;
-
             if(status === "invalid") {
-                alert(response);
+                showInfo(response);
                 return false;
             }
 
@@ -65,9 +68,9 @@ function createPlayer(event) {
                     alert('Error: ' + response.msg);
                 }
             });
-        }
-        else {
-            alert('Please fill in all fields');
+
+        } else {
+            showInfo("All values for a modified champion need to be filled.");
             return false;
         }
     });
@@ -80,7 +83,6 @@ function deletePlayer(event) {
     var confirmation = confirm('Are you sure you want to delete this user?');
 
     if (confirmation === true) {
-
         $.ajax({
             type: 'DELETE',
             url: '/users/deleteuser/' + $(this).attr('rel')
@@ -90,11 +92,10 @@ function deletePlayer(event) {
             else {
                 alert('Error: ' + response.msg);
             }
-
             populateTable();
         });
-    }
-    else {
+
+    } else {
         return false;
     }
 };
@@ -275,6 +276,7 @@ function deleteChampion() {
 // =============================================================
 function toggleShowChampions() {
 
+    clearInfo();
     var pid = $(this).attr('rel');
     $("#container_" + pid + " .playerTable tr").each(function(i, row) {
 
@@ -288,6 +290,7 @@ function toggleShowChampions() {
 // =============================================================
 function populateTable(shouldHideChampions) {
 
+    clearInfo();
     lastHiddenState = shouldHideChampions;
 
     // jQuery AJAX call for JSON
@@ -333,6 +336,7 @@ function populateTable(shouldHideChampions) {
         // Inject the whole content string into our existing HTML table
         $('#leaderboard').html(tableContent);
 
+        // Add operations to ops links
         $('.linkdeleteuser').click(deletePlayer);
         $('.linkaddchampion').click(createNewChampion);
         $('.linkupdatechamps').click(updateChampions);
@@ -393,4 +397,21 @@ function populateRows(player, shouldHideChampions) {
     ret += tRow;
     ret += body;
     return ret;
+}
+
+// Util functions
+// =============================================================
+function showInfo(text) {
+    var infobox = $("#info");
+    infobox.empty();
+    infobox.html(text);
+}
+
+function clearInfo() {
+    var infobox = $("#info");
+    infobox.empty();
+}
+
+function isTextValid(t) {
+    return (t !== undefined && t !== null && t !== "");
 }

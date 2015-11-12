@@ -136,3 +136,9 @@ fieldset button {
     border-radius: 5px;
     height: 30px;
 }
+
+#info {
+    margin-top: 5px;
+    color: orange;
+    font-size: 14px;
+}
