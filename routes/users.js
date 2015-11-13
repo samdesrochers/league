@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var Player = require('../models/player');
-
+var validOrderByStrategies = ["wins", "kills", "kda", "gold", "cs", "avggold", "avgcs"];
 var isAuthenticated = function (req, res, next) {
 
     // DEBUG
@@ -14,10 +14,17 @@ var isAuthenticated = function (req, res, next) {
 };
 
 /*
- * GET userlist.
+ * GET userlist with optional ORDERBY parameter.
  */
 router.get('/userlist', function(req, res) {
-    Player.find( {}, null, { sort: {totalWins: -1}}, function (err, players) {
+    var orderStrategy = validOrderByStrategies[0];
+    var orderStrategyParameter = req.query.orderby;
+
+    if(validOrderByStrategies.indexOf(orderStrategyParameter) > -1) {
+        orderStrategy = orderStrategyParameter;
+    }
+
+    Player.find().sort('-' + orderStrategy).exec(function (err, players) {
         if (err) return console.log(err);
         res.json(players);
     });
@@ -59,7 +66,7 @@ router.put('/updateuser/:id', isAuthenticated, function(req, res) {
 
         player.champions = req.body.champions;
         player.lastUpdated = req.body.date;
-        player.totalWins = req.body.totalWins;
+        player.wins = req.body.totalWins;
 
         player.save(function (err) {
             res.send(
