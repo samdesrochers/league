@@ -113,7 +113,7 @@ function createNewChampion(event) {
 };
 
 // =============================================================
-function updateChampions() {
+function updateChampions(event) {
 
     event.preventDefault();
     var pid = $(this).attr('rel');
@@ -225,7 +225,7 @@ function updateChampions() {
 }
 
 // =============================================================
-function deleteChampion() {
+function deleteChampion(event) {
 
     event.preventDefault();
     var confirmation = confirm('Are you sure you want to delete this champion?');
@@ -274,8 +274,9 @@ function deleteChampion() {
 }
 
 // =============================================================
-function toggleShowChampions() {
+function toggleShowChampions(event) {
 
+    event.preventDefault();
     clearInfo();
     var pid = $(this).attr('rel');
     $("#container_" + pid + " .playerTable tr").each(function(i, row) {
@@ -325,7 +326,7 @@ function populateTable(shouldHideChampions) {
 
                 // Add operations bar for each player
                 tableContent += '</table>';
-                tableContent += '<div class="champOps"><a href="#" class="linkaddchampion" rel="' + this._id + '">Add Champion</a> | <a href="#" class="linkupdatechamps" rel="' + this._id + '">Update Champions</a> | <a href="#" class="linkshowchamps" rel="' + this._id + '">Toggle Champions</a></div>';
+                tableContent += '<div class="champOps"><a href="#/" class="linkaddchampion" rel="' + this._id + '">Add Champion</a> | <a href="#/" class="linkupdatechamps" rel="' + this._id + '">Update Champions</a> | <a href="#/" class="linkshowchamps" rel="' + this._id + '">Toggle Champions</a></div>';
                 tableContent += '</div>';
 
             } catch(e) {

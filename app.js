@@ -35,6 +35,9 @@ app.use('/', index);
 var admin = require('./routes/admin');
 app.use('/admin', admin);
 
+var leaderboard = require('./routes/leaderboard');
+app.use('/leaderboard', leaderboard);
+
 var players = require('./routes/users');
 app.use('/users', players);
 

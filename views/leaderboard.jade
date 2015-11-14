@@ -5,42 +5,12 @@ html
     link(rel='stylesheet', href='/stylesheets/style.css')
   body
     script(src='http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js')
-    script(src='/javascripts/userlist.js')
+    script(src='/javascripts/leaderboardUtil.js')
+    script(src='/javascripts/leaderboard.js')
 
 block content
     h1= title
 
-    // Wrapper
     #wrapper
-
-        // USER INFO
-        #userInfo
-            h2 Player Info
-            p
-                strong Player Name:
-                |  <span id='playerInfoName'></span>
-                br
-                strong Games Played:
-                |  <span id='playerInfoGamesPlayed'></span>
-                br
-                strong Wins:
-                |  <span id='playerInfoWins'></span>
-                br
-                strong Top Champ:
-                |  <span id='playerInfoTopChamp'></span>
-        // /USER INFO
-
-        // USER LIST
-        h2 User List
-        #userList
-            table
-                thead
-                    th Player
-                    th Games Played
-                    th Wins
-                    th Losses
-                    th Top Champion
-                tbody
-        // /USER LIST
-
-    // /WRAPPER
+        br
+        #leaderboard
