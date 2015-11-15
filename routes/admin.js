@@ -5,8 +5,8 @@ var router = express.Router();
 
 var isAuthenticated = function (req, res, next) {
 
-	// DEBUG
-	return next();	
+	// // DEBUG
+	// return next();	
 
     if (req.isAuthenticated()) {
         return next();
@@ -16,7 +16,7 @@ var isAuthenticated = function (req, res, next) {
 
 /* GET Admin page. */
 router.get('/', isAuthenticated, function(req, res) {
-  res.render('admin', { title: 'LaLigue - Leaderboard <Admin>' });
+  res.render('admin', { title: 'La Ligue - Leaderboard <Admin>' });
 });
 
 module.exports = router;

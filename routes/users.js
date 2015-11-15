@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var Player = require('../models/player');
+
 var validOrderByStrategies = ["wins", "kills", "kda", "gold", "cs", "avggold", "avgcs"];
 var isAuthenticated = function (req, res, next) {
 
@@ -40,6 +41,16 @@ router.post('/adduser', isAuthenticated, function(req, res) {
         totalWins: 0,
         champions: []
     });
+
+    var reg = /^[a-z0-9']+$/i;
+    var isValid = true;
+
+    isValid = reg.test(newPlayer.name);
+    isValid = reg.test(newPlayer.iconId);
+
+    if(!isValid) {
+        res.send({ msg: "Invalid user input. Check that your Player name doesn't contain illegal characters." });
+    }
 
     newPlayer.save(function (err, newPlayer) {
         if(err) { 

@@ -4,6 +4,7 @@ var express       = require('express');
 var app           = express();                 
 var bodyParser    = require('body-parser');
 var cookieParser  = require('cookie-parser');
+var favicon       = require('serve-favicon');
 var logger        = require('morgan');
 var mongoose      = require('mongoose');
 var passport      = require('passport');
@@ -11,6 +12,7 @@ var path          = require('path');
 var LocalStrategy = require('passport-local').Strategy;
 
 app.use(logger('dev'));
+app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
@@ -45,16 +47,16 @@ var riot = require('./routes/riot');
 app.use('/riot', riot);
 
 /* Login - Register Special Routes */
-var register = require('./routes/register');
-app.use('/register', register);
+// var register = require('./routes/register');
+// app.use('/register', register);
 
 var login = require('./routes/login');
 app.use('/login', login);
 
 // DB CONFIG
 // =============================================================================
-mongoose.connect('mongodb://localhost/laligue');
-//mongoose.connect('mongodb://laliguedb:AJDDLozfoAk4unaPv36Qx0gl1NM3WlBmW8Apwy3sE4E-@ds052408.mongolab.com:52408/laliguedb');
+//mongoose.connect('mongodb://localhost/laligue');
+mongoose.connect('mongodb://laliguedb:AJDDLozfoAk4unaPv36Qx0gl1NM3WlBmW8Apwy3sE4E-@ds052408.mongolab.com:52408/laliguedb');
 
 // AUTH CONFIG
 // =============================================================================
@@ -87,4 +89,6 @@ app.use(function(err, req, res, next) {
 // =============================================================================
 app.listen(port);
 
-module.exports = app;
+module.exports = app; 
+
+//n0r-d1n
