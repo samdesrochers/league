@@ -37,6 +37,9 @@ app.use('/', index);
 var admin = require('./routes/admin');
 app.use('/admin', admin);
 
+var analyst = require('./routes/analyst');
+app.use('/analyst', analyst);
+
 var leaderboard = require('./routes/leaderboard');
 app.use('/leaderboard', leaderboard);
 
@@ -55,8 +58,8 @@ app.use('/login', login);
 
 // DB CONFIG
 // =============================================================================
-//mongoose.connect('mongodb://localhost/laligue');
-mongoose.connect('mongodb://laliguedb:AJDDLozfoAk4unaPv36Qx0gl1NM3WlBmW8Apwy3sE4E-@ds052408.mongolab.com:52408/laliguedb');
+mongoose.connect('mongodb://localhost/laligue');
+//mongoose.connect('mongodb://laliguedb:AJDDLozfoAk4unaPv36Qx0gl1NM3WlBmW8Apwy3sE4E-@ds052408.mongolab.com:52408/laliguedb');
 
 // AUTH CONFIG
 // =============================================================================

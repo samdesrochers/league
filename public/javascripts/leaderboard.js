@@ -43,7 +43,7 @@ function populateTable(shouldHideChampions) {
                 }
 
                 tableContent += '<div class="playerContainer" id="container_' + this._id +'"">';
-                tableContent += '<div class="playerName"><a href="#" class="linkshowuser" rel="' + this.name + '">#' + index++ + ": " + this.name + '</a></div>';
+                tableContent += '<div class="playerName"><a href="#/" class="linkshowchamps" rel="' + this._id + '">#' + index++ + ": " + this.name + '</a></div>';
                 tableContent += '<table class="playerTable">';
                 tableContent += getStatsHeaderRow();
 
@@ -58,7 +58,6 @@ function populateTable(shouldHideChampions) {
 
                 // Add operations bar for each player
                 tableContent += '</table>';
-                tableContent += '<div class="champOps"><a href="#/" class="linkshowchamps" rel="' + this._id + '">Toggle Champions</a></div>';
                 tableContent += '</div>';
 
             } catch(e) {

@@ -9,8 +9,22 @@ html
     script(src='/javascripts/leaderboard.js')
 
 block content
-    h1= title
-
+    #navbar
+        #announcement
+            a(href='http://www.twitch.tv/la_ligue' class='navlink') Live Show @ Lundi 7h00 PM    
+        #navlist
+            ul
+                li 
+                    a(href='/leaderboard' class='navlink') Leaderboard (Saison 3)
+                li
+                    a(href='/analyst' class='navlink') Analystes
+                li
+                    a(href='http://www.twitch.tv/la_ligue' class='navlink') Twitch | 
+                    a(href='https://www.facebook.com/laligueqc' class='navlink') Facebook | 
+                    a(href='https://www.reddit.com/r/laligueqc/' class='navlink') Reddit
+    br
+    hr
     #wrapper
+        h1 Leaderboard - Saison 3
         br
         #leaderboard

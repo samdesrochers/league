@@ -5,8 +5,6 @@ html
     link(rel='stylesheet', href='/stylesheets/style.css')
   body
     script(src='http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js')
-    script(src='/javascripts/adminHelper.js')
-    script(src='/javascripts/admin.js')
 
 block content
     #navbar
@@ -15,7 +13,7 @@ block content
         #navlist
             ul
                 li 
-                    a(href='/leaderboard' class='navlink selected') Leaderboard (Saison 3)
+                    a(href='/leaderboard' class='navlink') Leaderboard (Saison 3)
                 li
                     a(href='/analyst' class='navlink') Analystes
                 li
@@ -25,11 +23,5 @@ block content
     br
     hr
     #wrapper
-        h1 Leaderboard - Admin
+        h1 Analystes
         br
-        #leaderboard
-        br
-        fieldset
-            input#inputPlayerName(type='text', placeholder='Player Name')
-            button#btnAddPlayer Add Player
-        #info
