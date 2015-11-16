@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var Player = require('../models/player');
 
-var validOrderByStrategies = ["wins", "kills", "kda", "gold", "cs", "avggold", "avgcs"];
+var validOrderByStrategies = ["totalKills", "totalWins", "kda", "gold", "cs", "avggold", "avgcs"];
 var isAuthenticated = function (req, res, next) {
 
     // DEBUG
@@ -25,7 +25,7 @@ router.get('/userlist', function(req, res) {
         orderStrategy = orderStrategyParameter;
     }
 
-    Player.find().sort('-' + orderStrategy).exec(function (err, players) {
+    Player.find().sort('-totalKills').exec(function (err, players) {
         if (err) return console.log(err);
         res.json(players);
     });
@@ -38,6 +38,7 @@ router.post('/adduser', isAuthenticated, function(req, res) {
     var newPlayer = new Player({ name: req.body.name, 
         iconId: req.body.iconId, 
         lastUpdated: req.body.lastUpdated,
+        totalKills: 0,
         totalWins: 0,
         champions: []
     });
@@ -77,7 +78,8 @@ router.put('/updateuser/:id', isAuthenticated, function(req, res) {
 
         player.champions = req.body.champions;
         player.lastUpdated = req.body.date;
-        player.wins = req.body.totalWins;
+        player.totalKills = req.body.totalKills;
+        player.totalWins = req.body.totalWins;
 
         player.save(function (err) {
             res.send(

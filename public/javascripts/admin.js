@@ -42,14 +42,20 @@ function createPlayer(event) {
             response = response.substring(response.indexOf('{'), response.length);
             response = response.replace("undefined", name);
             var summoner = $.parseJSON(response);
-            
+
             var newPlayer = {
                 name: summoner.name,
                 iconId: summoner.profileIconId,
                 lastUpdated: createdDate,
                 creationTime: createdDate,
                 champions: [],
+                totalKills: 0,
                 totalWins: 0
+            }
+
+            // TODO : Check for actual response [Temporary]
+            if (newPlayer.iconId > 950) {
+                newPlayer.iconId = 1;
             }
 
             // Use AJAX to post the object to our adduser service
@@ -123,6 +129,7 @@ function updateChampions(event) {
         }
     }
 
+    var tKills = 0;
     var tWins = 0;
     var updatedChampions = [];
     var updateDate = new Date().toISOString();
@@ -165,7 +172,6 @@ function updateChampions(event) {
         player.champions = [];
         for (var c in updatedChampions) {
             player.champions.push(updatedChampions[c]);
-            tWins += updatedChampions[c].wins;
         }
 
     } else {
@@ -192,11 +198,15 @@ function updateChampions(event) {
                 updatingc.cs += parseInt(existingc.cs);
                 updatingc.gold += parseInt(existingc.gold);
                 player.champions[foundIndex] = updatingc;
-                tWins += updatingc.wins;
             } else {
                 player.champions.push(updatingc);
             }
         };
+    }
+
+    for(var c in player.champions) {
+        tKills += player.champions[c].kills;
+        tWins += player.champions[c].wins;
     }
 
     player.lastUpdated = updateDate;
@@ -205,7 +215,7 @@ function updateChampions(event) {
     // Use AJAX to post the object to our update service
     $.ajax({
         type: 'PUT',
-        data:{champions:json, date:updateDate, totalWins:tWins},
+        data:{champions:json, date:updateDate, totalKills:tKills, totalWins:tWins},
         url: '/users/updateuser/' + pid,
         dataType: 'JSON'
     }).done(function( response ) {

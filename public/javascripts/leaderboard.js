@@ -38,6 +38,10 @@ function populateTable(shouldHideChampions) {
         $.each(data, function(){
             try{
 
+                if(this.champions === undefined || this.champions.length <= 0) {
+                    return true;
+                }
+
                 tableContent += '<div class="playerContainer" id="container_' + this._id +'"">';
                 tableContent += '<div class="playerName"><a href="#" class="linkshowuser" rel="' + this.name + '">#' + index++ + ": " + this.name + '</a></div>';
                 tableContent += '<table class="playerTable">';
@@ -50,10 +54,6 @@ function populateTable(shouldHideChampions) {
                     this.champions = championsJSON;
                     tableContent += populateRows(this);
 
-                } else {
-
-                    tableContent += getNewPlayerRow(this._id, this.name, this.iconId, this.lastUpdated);
-                    
                 }
 
                 // Add operations bar for each player

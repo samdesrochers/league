@@ -5,7 +5,8 @@ var playerSchema = new Schema({
   name: String,
   iconId: String,
   lastUpdated: Date,
-  wins: Number,
+  totalKills: Number,
+  totalWins: Number,
   champions: []
 });
 

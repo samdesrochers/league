@@ -19,9 +19,10 @@ function getStatsHeaderRow() {
 
 //-----------------------------------------------------------
 function getPlayerStatsRow(id, iconid, kills, deaths, assists, kda, wins, games, cs, avgcs, gold, avggold, lastUpdated) {
+    
     var row = ""
     row += '<tr class="playerTotalRow">';
-    row += '<td class="tdChampSquare"><img class="imgSmallSquare" src="http://ddragon.leagueoflegends.com/cdn/5.22.1/img/profileicon/'+ iconid +'.png" alt="' + iconid +'"/></td>';
+    row += '<td class="tdChampSquare"><img class="imgSmallSquare" src="http://ddragon.leagueoflegends.com/cdn/5.22.1/img/profileicon/'+ iconid +'.png" alt="http://ddragon.leagueoflegends.com/cdn/5.22.1/img/profileicon/1.png"/></td>';
     row += '<td class="tdHeaderValue">' + kills + '</td>';
     row += '<td class="tdHeaderValue">' + deaths + '</td>';
     row += '<td class="tdHeaderValue">' + assists + '</td>';

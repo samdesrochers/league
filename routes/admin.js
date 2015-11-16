@@ -5,8 +5,8 @@ var router = express.Router();
 
 var isAuthenticated = function (req, res, next) {
 
-	// // DEBUG
-	// return next();	
+	// DEBUG
+	return next();	
 
     if (req.isAuthenticated()) {
         return next();
