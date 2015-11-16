@@ -27,7 +27,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-var port = process.env.PORT || 3333;
+// var port = process.env.PORT || 3333;
 
 // ROUTES 
 // =============================================================================
@@ -87,7 +87,7 @@ app.use(function(err, req, res, next) {
 
 // RUN 
 // =============================================================================
-app.listen(port);
+// app.listen(port);
 
 module.exports = app; 
 
