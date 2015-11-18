@@ -36,7 +36,8 @@ router.get('/userlist', function(req, res) {
  */
 router.post('/adduser', isAuthenticated, function(req, res) {
     var newPlayer = new Player({ name: req.body.name, 
-        iconId: req.body.iconId, 
+        iconId: req.body.iconId,
+        summonerId: req.body.summonerId,
         lastUpdated: req.body.lastUpdated,
         totalKills: 0,
         totalWins: 0,
@@ -71,15 +72,27 @@ router.post('/adduser', isAuthenticated, function(req, res) {
 router.put('/updateuser/:id', isAuthenticated, function(req, res) {
 
     var playerId = req.params.id;
+    console.log(playerId);
     Player.findById(playerId, function(err, player) {
         if (err) {
             return console.log(err);
         }
 
+        var json = JSON.parse(req.body.champions);
+
+        player.totalKills = 0;
+        player.totalWins = 0;
+
+        for (var i = json.length - 1; i >= 0; i--) {
+            var c = json[i];
+            if(c !== null && c !== undefined) {
+                player.totalKills += parseInt(c.kills);
+                player.totalWins += parseInt(c.wins);
+            }
+        };
+
         player.champions = req.body.champions;
         player.lastUpdated = req.body.date;
-        player.totalKills = req.body.totalKills;
-        player.totalWins = req.body.totalWins;
 
         player.save(function (err) {
             res.send(

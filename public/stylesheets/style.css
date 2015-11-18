@@ -190,7 +190,7 @@ fieldset button {
     margin-top: 240px;
     margin-left: 20px;
     font-size: 16px;
-    color: #aaa;
+    color: #fff;
 }
 
 #navlist {
@@ -215,7 +215,7 @@ fieldset button {
 
 #navbar a {
     text-decoration: none;
-    color: #ddd;
+    color: #fff;
 }
 
 #navbar a:hover, .selected {

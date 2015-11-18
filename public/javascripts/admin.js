@@ -50,7 +50,7 @@ function createPlayer(event) {
             var newPlayer = {
                 name: summoner.name,
                 iconId: summoner.profileIconId,
-                summonerid: summoner.id,
+                summonerId: summoner.id,
                 lastUpdated: createdDate,
                 creationTime: createdDate,
                 champions: [],
@@ -220,7 +220,7 @@ function updateChampions(event) {
     // Use AJAX to post the object to our update service
     $.ajax({
         type: 'PUT',
-        data:{champions:json, date:updateDate, totalKills:tKills, totalWins:tWins},
+        data:{champions:json, date:updateDate},
         url: '/users/updateuser/' + pid,
         dataType: 'JSON'
     }).done(function( response ) {
@@ -232,8 +232,8 @@ function updateChampions(event) {
         }
         else {
             // If something goes wrong, alert the error message that our service returned
-            var msg = response.msg;
-            alert('Error: ' + response.msg);
+            var e = response.msg;
+            alert('Error: ' + e.message);
         }
     });
 }
@@ -553,8 +553,21 @@ function consolidatePlayerStats(players) {
 
                 var res = $.parseJSON(response);
                 p.championkey = res.key;
-                var te = 1;
-                // TODO : SAVE IF NOT EXIST, UPDATE IF EXSIT
+                p.championname = res.name;
+
+                var playerExists = false;
+                for (var i = playerListData.length - 1; i >= 0; i--) {
+                    var existingplayer = playerListData[i];
+                    if (existingplayer.summonerId === p.summonerid) {
+                        updateExistingPlayer(existingplayer, p);
+                        playerExists = true;
+                        break;
+                    }
+                }
+
+                if(!playerExists) {
+                    // SAVE
+                }
 
             } else {
                 showInfo("All values for a modified champion need to be filled.");
@@ -566,4 +579,62 @@ function consolidatePlayerStats(players) {
             async: true
         }); 
     };
+}
+
+function updateExistingPlayer(exp, matchPlayer) {
+    var championExists = false;
+    var updateDate = new Date().toISOString();
+
+    for (var j = exp.champions.length - 1; j >= 0; j--) {
+        var champion = exp.champions[j];
+        if(champion.name === matchPlayer.championname) {
+            champion.kills += matchPlayer.stats.kills;
+            champion.deaths += matchPlayer.stats.deaths;
+            champion.assists += matchPlayer.stats.assists;
+            champion.wins += matchPlayer.stats.winner === true ? 1 : 0;
+            champion.games += 1;
+            champion.cs += matchPlayer.stats.minionsKilled;
+            champion.gold += matchPlayer.stats.goldEarned;
+            champion.lastUpdated = updateDate;
+            championExists = true;
+        }
+    }
+
+    if (!championExists) {
+        var newChampion = {
+            name : matchPlayer.championname,
+            kills : matchPlayer.stats.kills,
+            deaths : matchPlayer.stats.deaths,
+            assists : matchPlayer.stats.assists,
+            wins : matchPlayer.stats.winner === true ? 1 : 0,
+            games : 1,
+            cs : matchPlayer.stats.minionsKilled,
+            gold : matchPlayer.stats.goldEarned,
+            lastUpdated : updateDate
+        }
+
+        exp.champions.push(newChampion);
+    }
+
+    var json = JSON.stringify(exp.champions);
+
+    // Use AJAX to post the object to our update service
+    $.ajax({
+        type: 'PUT',
+        data:{champions:json, date:updateDate},
+        url: '/users/updateuser/' + exp._id,
+        dataType: 'JSON'
+    }).done(function( response ) {
+        // Check for successful (blank) response
+        if (response.msg === '') {
+
+            // Update the table
+            populateTable();
+        }
+        else {
+            // If something goes wrong, alert the error message that our service returned
+            var e = response.msg;
+            alert('Error: ' + e.message);
+        }
+    });
 }
