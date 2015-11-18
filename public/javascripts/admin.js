@@ -1,4 +1,6 @@
 var playerListData = [];
+var matchesData = [];
+var lastMatchStats = '';
 
 // DOM Ready =============================================================
 $(document).ready(function() {
@@ -8,6 +10,8 @@ $(document).ready(function() {
 
     // Add User button click
     $('#btnAddPlayer').on('click', createPlayer);
+    $('#btnLastGame').on('click', populateLastGames);
+
 });
 
 // =============================================================
@@ -46,6 +50,7 @@ function createPlayer(event) {
             var newPlayer = {
                 name: summoner.name,
                 iconId: summoner.profileIconId,
+                summonerid: summoner.id,
                 lastUpdated: createdDate,
                 creationTime: createdDate,
                 champions: [],
@@ -423,4 +428,142 @@ function clearInfo() {
 
 function isTextValid(t) {
     return (t !== undefined && t !== null && t !== "");
+}
+
+function populateLastGames() {
+
+    event.preventDefault();
+    matchesdata = [];
+
+    var name = $('fieldset input#inputPlayerLastGame').val();
+
+    if (!isTextValid(name)) {
+        showInfo("Invalid or Empty player name.");
+        return;
+    }
+
+    // Get Summoner id from RIOT
+    $.getJSON( '/riot/lastmatches/' + name, function( data ) {      
+        if (data !== undefined) {            
+            var status = data.status;
+            var response = data.response;
+            if(status === "invalid") {
+                showInfo(response);
+                return false;
+            }
+
+            var container = $("#matchesdata");
+            var res = $.parseJSON(response);
+
+            for (var i = 0; i < res.games.length/2; i++) {
+
+                var g = res.games[i];
+                var date = new Date(g.createDate);
+                var id = g.gameId;
+                var players = [];
+
+                for (var j = g.fellowPlayers.length - 1; j >= 0; j--) {
+                    var p = g.fellowPlayers[j];
+                    players.push({summonerid:p.summonerId, championid:p.championId, teamid:p.teamId});
+                };
+                    
+                players.push({summonerid:res.summonerId, championid:g.championId, teamid:g.teamId});
+                matchesdata.push( { gameid:id, players:players } );
+                container.append('<a href="#/" class="linkgetmatch" rel="' + id + '">' + id + '</a>' + " " + date + "</br>");
+            };
+
+            $(".linkgetmatch").click(getMatchData);
+            var fd = 1;
+            
+        } else {
+            showInfo("All values for a modified champion need to be filled.");
+            return false;
+        }
+    });
+}
+
+function getMatchData() {
+    var gameId = parseInt($(this).attr('rel'));
+    var match = '';
+
+    // Get local match data for matching game id
+    for (var i = matchesdata.length - 1; i >= 0; i--) {
+        var t = matchesdata[i];
+        if(t.gameid === gameId) {
+            match = t;
+            break;
+        }
+    }
+
+    var players = match.players;
+    $.getJSON( '/riot/matchdata/' + gameId, function( data ) {      
+        if (data !== undefined) {            
+            var status = data.status;
+            var response = data.response;
+            if(status === "invalid") {
+                showInfo(response);
+                return false;
+            }
+
+            var res = $.parseJSON(response);
+            for (var i = res.participants.length - 1; i >= 0; i--) {
+                var participant = res.participants[i];
+                for (var j = players.length - 1; j >= 0; j--) {
+                    var player = players[j];
+
+                    if(player.championid === participant.championId 
+                        && player.teamid === participant.teamId) {
+                        player.stats = participant.stats;
+                    }
+
+                };
+            };
+
+            consolidatePlayerStats(players);
+
+        } else {
+            showInfo("All values for a modified champion need to be filled.");
+            return false;
+        }
+    });
+}
+
+function consolidatePlayerStats(players) {
+
+    for (var i = players.length - 1; i >= 0; i--) {
+        
+        var p = players[i];
+        var sid = p.summonerid;
+        var cid = p.championid;
+        var tid = p.teamid;
+        var stats = p.stats;
+
+        $.ajaxSetup({
+            async: false
+        });
+
+        $.getJSON( '/riot/champion/' + cid, function( data ) {      
+            if (data !== undefined) {            
+                var status = data.status;
+                var response = data.response;
+                if(status === "invalid") {
+                    showInfo(response);
+                    return false;
+                }
+
+                var res = $.parseJSON(response);
+                p.championkey = res.key;
+                var te = 1;
+                // TODO : SAVE IF NOT EXIST, UPDATE IF EXSIT
+
+            } else {
+                showInfo("All values for a modified champion need to be filled.");
+                return false;
+            }
+        }); 
+
+        $.ajaxSetup({
+            async: true
+        }); 
+    };
 }

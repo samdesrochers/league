@@ -4,6 +4,7 @@ var Schema = mongoose.Schema;
 var playerSchema = new Schema({
   name: String,
   iconId: String,
+  summonerId: Number,
   lastUpdated: Date,
   totalKills: Number,
   totalWins: Number,
