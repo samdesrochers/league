@@ -1,7 +1,9 @@
 var express = require('express');
+var request = require('request');
 var router = express.Router();
 var Player = require('../models/player');
 
+var apikey = "b4283e24-9216-4553-9e73-ac664a6a9d8b";
 var validOrderByStrategies = ["totalKills", "totalWins", "kda", "gold", "cs", "avggold", "avgcs"];
 var isAuthenticated = function (req, res, next) {
 
@@ -63,6 +65,55 @@ router.post('/adduser', isAuthenticated, function(req, res) {
         res.send(
             (err === null) ? { msg: '' } : { msg: err }
         );
+    });
+});
+
+router.get('/addautoplayer/:id', isAuthenticated, function(req, res) {
+
+    var sid = req.params.id;
+    var url = "https://na.api.pvp.net/api/lol/na/v1.4/summoner/" + sid + "?api_key=" + apikey;
+    
+    request(url, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+
+            var summoner = JSON.parse(body);
+            console.log(summoner[sid].name);
+
+            var newPlayer = new Player(
+                { name: summoner[sid].name, 
+                iconId: summoner[sid].profileIconId < 950 ? summoner[sid].profileIconId : "1",
+                summonerId: summoner[sid].id,
+                lastUpdated: new Date().toISOString(),
+                totalKills: 0,
+                totalWins: 0,
+                champions: []
+            });
+
+            newPlayer.save(function (err, newPlayer) {
+                if(err) { 
+                    res.json(
+                    {
+                        status:"invalid", 
+                        response:"Error occured while processing add auto player : " + err
+                    });
+                }
+
+                res.json(
+                {
+                    status:"valid", 
+                    response:newPlayer
+                });
+            });
+
+        } else {
+
+            res.json(
+            {
+                status:"invalid",
+                code:response.statusCode, 
+                response:"Error occured while processing add auto player " + sid + " : " + error
+            });
+        }
     });
 });
 

@@ -402,7 +402,8 @@ function populateRows(player) {
     } else {
         tAvgCs = Math.max(Math.round(tCs / tGames), 0);
         tAvgGold = Math.max(Math.round(tGold / tGames), 0);
-        tKda = Math.round((parseInt(tKills) + parseInt(tAssists)) / Math.max(1, parseInt(tDeaths))); //(K+A) / Max(1,D)
+        tKda = (parseFloat(tKills) + parseFloat(tAssists)) / Math.max(1, parseFloat(tDeaths)); //(K+A) / Max(1,D)
+        tKda = tKda.toFixed(2);
     }
 
     var tRow = getPlayerStatsRow(player._id, player.iconId, tKills, tDeaths, tAssists, tKda, tWins, 
@@ -411,23 +412,6 @@ function populateRows(player) {
     ret += tRow;
     ret += body;
     return ret;
-}
-
-// Util functions
-// =============================================================
-function showInfo(text) {
-    var infobox = $("#info");
-    infobox.empty();
-    infobox.html(text);
-}
-
-function clearInfo() {
-    var infobox = $("#info");
-    infobox.empty();
-}
-
-function isTextValid(t) {
-    return (t !== undefined && t !== null && t !== "");
 }
 
 function populateLastGames() {
@@ -530,64 +514,137 @@ function getMatchData() {
 
 function consolidatePlayerStats(players) {
 
+    $.ajaxSetup({
+        async: false
+    });
+
+    var time = 0;
     for (var i = players.length - 1; i >= 0; i--) {
-        
+        time += 500;
         var p = players[i];
-        var sid = p.summonerid;
-        var cid = p.championid;
-        var tid = p.teamid;
-        var stats = p.stats;
+        setTimeout(function(p, i, min) {
+            return function() {
+                console.log("about to run " + p.championid);
+                runAutomatedUpdateIteration(p);
+                console.log("done running " + p.championid);
 
-        $.ajaxSetup({
-            async: false
-        });
-
-        $.getJSON( '/riot/champion/' + cid, function( data ) {      
-            if (data !== undefined) {            
-                var status = data.status;
-                var response = data.response;
-                if(status === "invalid") {
-                    showInfo(response);
-                    return false;
+                if(i === min) {
+                    populateTable();
                 }
+            }
+        }(p, i, 0), time);
+    }
 
-                var res = $.parseJSON(response);
-                p.championkey = res.key;
-                p.championname = res.name;
+    $.ajaxSetup({
+        async: true
+    }); 
+}
 
-                var playerExists = false;
-                for (var i = playerListData.length - 1; i >= 0; i--) {
-                    var existingplayer = playerListData[i];
-                    if (existingplayer.summonerId === p.summonerid) {
-                        updateExistingPlayer(existingplayer, p);
-                        playerExists = true;
-                        break;
-                    }
-                }
+function runAutomatedUpdateIteration(p) {
 
-                if(!playerExists) {
-                    // SAVE
-                }
+    var sid = p.summonerid;
+    var cid = p.championid;
+    var tid = p.teamid;
+    var stats = p.stats;
 
-            } else {
-                showInfo("All values for a modified champion need to be filled.");
+    console.log("getting champion for " + p.championid);
+    $.getJSON( '/riot/champion/' + cid, function( data ) {
+        console.log("got champion for " + p.championid);      
+        if (data !== undefined) {            
+            var status = data.status;
+            var response = data.response;
+            if(status === "invalid") {
+                showInfo("Error @ Getting Champion | " + p.championid + " : " + response);
                 return false;
             }
-        }); 
 
-        $.ajaxSetup({
-            async: true
-        }); 
-    };
+            var res = $.parseJSON(response);
+            p.championkey = res.key;
+            p.championname = res.name;
+
+            var playerExists = false;
+            for (var i = playerListData.length - 1; i >= 0; i--) {
+                var existingplayer = playerListData[i];
+                if (existingplayer.summonerId === p.summonerid) {
+                    updateExistingPlayer(existingplayer, p);
+                    playerExists = true;
+                    break;
+                }
+            }
+
+            // Save new player
+            if(!playerExists) {
+                addAutomatedPlayer(sid, stats, p)
+            }
+
+        } else {
+            showInfo("All values for a modified champion need to be filled.");
+            return false;
+        }
+    }); 
+}
+
+function addAutomatedPlayer(sid, stats, p) {
+    $.getJSON( '/users/addautoplayer/' + sid, function( data ) {      
+        if (data !== undefined) {            
+            var status = data.status;
+            var response = data.response;
+
+            if(status === "invalid") {
+                showInfo("Error @ Saving New Player | " + sid + " : " + response);
+                return false;
+            }
+
+            var player = response;
+            pushNewPlayer(player, stats, p.championkey);
+            return true;
+
+        } else {
+            showInfo("All values for a modified champion need to be filled.");
+            return false;
+        }
+    }); 
+}
+
+function pushNewPlayer(player, stats, key) {
+    var newChampion = {
+        name : key,
+        kills : stats.kills,
+        deaths : stats.deaths,
+        assists : stats.assists,
+        wins : stats.winner === true ? 1 : 0,
+        games : 1,
+        cs : stats.minionsKilled,
+        gold : stats.goldEarned,
+        lastUpdated : new Date().toISOString()
+    }
+
+    player.champions.push(newChampion);
+    var json = JSON.stringify(player.champions);
+
+    $.ajax({
+        type: 'PUT',
+        data:{champions:json, date:new Date().toISOString()},
+        url: '/users/updateuser/' + player._id,
+        dataType: 'JSON'
+    }).done(function( response ) {
+        if (response.msg === '') {
+
+        }
+        else {
+            var e = response.msg;
+            alert('Error: ' + e.message);
+        }
+    });
 }
 
 function updateExistingPlayer(exp, matchPlayer) {
+    
     var championExists = false;
-    var updateDate = new Date().toISOString();
-
+    var date = new Date().toISOString();
     for (var j = exp.champions.length - 1; j >= 0; j--) {
         var champion = exp.champions[j];
-        if(champion.name === matchPlayer.championname) {
+        if(champion.name === matchPlayer.championkey) {
             champion.kills += matchPlayer.stats.kills;
             champion.deaths += matchPlayer.stats.deaths;
             champion.assists += matchPlayer.stats.assists;
@@ -595,14 +652,14 @@ function updateExistingPlayer(exp, matchPlayer) {
             champion.games += 1;
             champion.cs += matchPlayer.stats.minionsKilled;
             champion.gold += matchPlayer.stats.goldEarned;
-            champion.lastUpdated = updateDate;
+            champion.lastUpdated = date;
             championExists = true;
         }
     }
 
     if (!championExists) {
         var newChampion = {
-            name : matchPlayer.championname,
+            name : matchPlayer.championkey,
             kills : matchPlayer.stats.kills,
             deaths : matchPlayer.stats.deaths,
             assists : matchPlayer.stats.assists,
@@ -610,7 +667,7 @@ function updateExistingPlayer(exp, matchPlayer) {
             games : 1,
             cs : matchPlayer.stats.minionsKilled,
             gold : matchPlayer.stats.goldEarned,
-            lastUpdated : updateDate
+            lastUpdated : date
         }
 
         exp.champions.push(newChampion);
@@ -621,15 +678,13 @@ function updateExistingPlayer(exp, matchPlayer) {
     // Use AJAX to post the object to our update service
     $.ajax({
         type: 'PUT',
-        data:{champions:json, date:updateDate},
+        data:{champions:json, date:date},
         url: '/users/updateuser/' + exp._id,
         dataType: 'JSON'
     }).done(function( response ) {
         // Check for successful (blank) response
         if (response.msg === '') {
 
-            // Update the table
-            populateTable();
         }
         else {
             // If something goes wrong, alert the error message that our service returned
@@ -637,4 +692,21 @@ function updateExistingPlayer(exp, matchPlayer) {
             alert('Error: ' + e.message);
         }
     });
+}
+
+// Util functions
+// =============================================================
+function showInfo(text) {
+    var infobox = $("#info");
+    infobox.empty();
+    infobox.html(text);
+}
+
+function clearInfo() {
+    var infobox = $("#info");
+    infobox.empty();
+}
+
+function isTextValid(t) {
+    return (t !== undefined && t !== null && t !== "");
 }

@@ -113,7 +113,8 @@ function getChampionInputRow(champname) {
 function getChampionRow(id, champname, kills, deaths, assists, wins, games, cs, gold, lastUpdated) {
     var row = '';
     var gamesInt = parseInt(games);
-    var kda = Math.round((parseInt(kills) + parseInt(assists)) / Math.max(1, parseInt(deaths))); //(K+A) / Max(1,D)
+    var kda = (parseInt(kills) + parseInt(assists)) / Math.max(1, parseInt(deaths)); //(K+A) / Max(1,D)
+    kda = kda.toFixed(2);
     var csPerGame = (gamesInt === 0 || cs === 0) ? 0 : Math.round(parseInt(cs)/gamesInt);
     var goldPerGame = (gamesInt === 0 || gold === 0) ? 0 : Math.round(parseInt(gold)/gamesInt);
     var formattedDate = getFormattedDate(lastUpdated);
