@@ -114,7 +114,8 @@ function populateRows(player) {
     } else {
         tAvgCs = Math.max(Math.round(tCs / tGames), 0);
         tAvgGold = Math.max(Math.round(tGold / tGames), 0);
-        tKda = Math.round((parseInt(tKills) + parseInt(tAssists)) / Math.max(1, parseInt(tDeaths))); //(K+A) / Max(1,D)
+        tKda = (parseFloat(tKills) + parseFloat(tAssists)) / Math.max(1, parseFloat(tDeaths)); //(K+A) / Max(1,D)
+        tKda = tKda.toFixed(2);    
     }
 
     var tRow = getPlayerStatsRow(player._id, player.iconId, tKills, tDeaths, tAssists, tKda, tWins, 

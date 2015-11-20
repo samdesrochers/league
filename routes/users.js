@@ -13,7 +13,7 @@ var validOrderByStrategies = ["totalKills", "totalWins", "kda", "gold", "cs", "a
 var isAuthenticated = function (req, res, next) {
 
     // DEBUG
-    return next();
+    // return next();
 
     if (req.isAuthenticated()) {
         return next();
