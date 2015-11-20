@@ -48,8 +48,8 @@ var riot = require('./routes/riot');
 app.use('/riot', riot);
 
 /* Login - Register Special Routes */
-var register = require('./routes/register');
-app.use('/register', register);
+// var register = require('./routes/register');
+// app.use('/register', register);
 
 var login = require('./routes/login');
 app.use('/login', login);
