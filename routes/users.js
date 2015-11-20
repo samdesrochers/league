@@ -1,7 +1,12 @@
 var express = require('express');
 var request = require('request');
 var router = express.Router();
+var NodeCache = require( "node-cache" );
 var Player = require('../models/player');
+
+var appCache = new NodeCache();
+var cacheTimeToLive = 900; //s, 15m
+var playersCacheKey = "players";
 
 var apikey = "b4283e24-9216-4553-9e73-ac664a6a9d8b";
 var validOrderByStrategies = ["totalKills", "totalWins", "kda", "gold", "cs", "avggold", "avgcs"];
@@ -27,16 +32,24 @@ router.get('/userlist', function(req, res) {
         orderStrategy = orderStrategyParameter;
     }
 
-    Player.find().sort('-totalKills').exec(function (err, players) {
-        if (err) return console.log(err);
-        res.json(players);
-    });
+    cachedPlayers = appCache.get(playersCacheKey);
+    if (cachedPlayers == undefined) {
+        Player.find().sort('-totalKills').exec(function (err, players) {
+            if (err) return console.log(err);
+            appCache.set(playersCacheKey, players, cacheTimeToLive);
+            res.json(players);
+        }); 
+    } else {
+        console.log("Get Players Cache Hit");
+        res.json(cachedPlayers);
+    }
 });
 
 /*
  * POST new user.
  */
 router.post('/adduser', isAuthenticated, function(req, res) {
+    appCache.del(playersCacheKey);
     var newPlayer = new Player({ name: req.body.name, 
         iconId: req.body.iconId,
         summonerId: req.body.summonerId,
@@ -70,6 +83,7 @@ router.post('/adduser', isAuthenticated, function(req, res) {
 
 router.get('/addautoplayer/:id', isAuthenticated, function(req, res) {
 
+    appCache.del(playersCacheKey);
     var sid = req.params.id;
     var url = "https://na.api.pvp.net/api/lol/na/v1.4/summoner/" + sid + "?api_key=" + apikey;
     
@@ -122,6 +136,7 @@ router.get('/addautoplayer/:id', isAuthenticated, function(req, res) {
  */
 router.put('/updateuser/:id', isAuthenticated, function(req, res) {
 
+    appCache.del(playersCacheKey);
     var playerId = req.params.id;
     console.log(playerId);
     Player.findById(playerId, function(err, player) {
@@ -157,6 +172,8 @@ router.put('/updateuser/:id', isAuthenticated, function(req, res) {
  * DELETE existing user.
  */
 router.delete('/deleteuser/:id', isAuthenticated, function(req, res) {
+
+    appCache.del(playersCacheKey);
     var playerId = req.params.id;
     Player.remove({ '_id' : playerId }, function(err) {
         res.send((err === null) ? { msg: '' } : { msg:'error: ' + err });

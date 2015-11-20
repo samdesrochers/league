@@ -2,6 +2,7 @@ doctype html
 html
   head
     title= title
+    link(rel="stylesheet", href="stylesheets/spinner.css")
     link(rel='stylesheet', href='/stylesheets/style.css')
   body
     script(src='http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js')
@@ -28,4 +29,6 @@ block content
     #wrapper
         h1 Leaderboard - Saison 3
         br
+        #spinner
+            |Loading...
         #leaderboard

@@ -24,7 +24,7 @@ function toggleShowChampions(event) {
 // =============================================================
 function populateTable(shouldHideChampions) {
 
-    lastHiddenState = shouldHideChampions;
+    $("#spinner").show();
 
     // jQuery AJAX call for JSON
     $.getJSON( '/users/userlist', function( data ) {
@@ -68,6 +68,8 @@ function populateTable(shouldHideChampions) {
         // Inject the whole content string into our existing HTML table
         $('#leaderboard').html(tableContent);
         $('.linkshowchamps').click(toggleShowChampions);
+
+        $("#spinner").hide();
     });
 };
 
