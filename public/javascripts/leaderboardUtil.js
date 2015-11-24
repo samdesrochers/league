@@ -31,8 +31,8 @@ function getPlayerStatsRow(id, iconid, kills, deaths, assists, kda, wins, games,
     row += '<td class="tdHeaderValue">' + games + '</td>';
     row += '<td class="tdHeaderValue">' + cs + '</td>';
     row += '<td class="tdHeaderValue">' + avgcs + '</td>';
-    row += '<td class="tdHeaderValue">' + gold + '</td>';
-    row += '<td class="tdHeaderValue">' + avggold + '</td>';
+    row += '<td class="tdHeaderValue">' + numberWithCommas(gold) + '</td>';
+    row += '<td class="tdHeaderValue">' + numberWithCommas(avggold) + '</td>';
     row += '</tr>';
     return row;
 }
@@ -58,8 +58,13 @@ function getChampionRow(id, champname, kills, deaths, assists, wins, games, cs, 
     row += '<td class="tdHeaderValue">' + games + '</td>';
     row += '<td class="tdHeaderValue">' + cs + '</td>';
     row += '<td class="tdHeaderValue">' + csPerGame + '</td>';
-    row += '<td class="tdHeaderValue">' + gold + '</td>';
-    row += '<td class="tdHeaderValue">' + goldPerGame + '</td>';
+    row += '<td class="tdHeaderValue">' + numberWithCommas(gold) + '</td>';
+    row += '<td class="tdHeaderValue">' + numberWithCommas(goldPerGame) + '</td>';
     row += '</tr>';
     return row;
+}
+
+// Util to format numbers
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }

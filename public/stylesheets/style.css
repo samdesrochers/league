@@ -78,7 +78,7 @@ a:visited {
     margin: 0 auto;
     background-color: #222;
     border-collapse: collapse;
-    color: white;
+    color: #eee;
 }
 
 .playerTable input {
@@ -107,7 +107,9 @@ a:visited {
 .tdHeaderValue {
     width: 90px;
     height: 60px;
-    font-size: 15px;
+    font-size: 16px;
+    font-family: Arial;
+    font-weight: lighter;
 }
 
 .tdChampSquare {
